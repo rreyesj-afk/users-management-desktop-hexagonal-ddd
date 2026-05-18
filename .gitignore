@@ -40,3 +40,4 @@ build/
 .idea/
 *.log
 
+users-management-desktop-hexagonal-ddd\target\classes\application.properties
