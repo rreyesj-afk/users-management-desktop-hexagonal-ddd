@@ -19,12 +19,8 @@ public record EmpresaId (String value) {
     }
 
     //Genera un ID nuevo y único cada vez que se llama
-    public static EmpresaId nuevo() {
-        return new EmpresaId(UUID.randomUUID().toString());
-    }
+    public static EmpresaId newId() {return new EmpresaId(UUID.randomUUID().toString());}
 
-    public static EmpresaId de(String valor) {
-        return new EmpresaId(valor);
-    }
+    public static EmpresaId fromExistingValue(String valor) {return new EmpresaId(valor);}
 
 }
