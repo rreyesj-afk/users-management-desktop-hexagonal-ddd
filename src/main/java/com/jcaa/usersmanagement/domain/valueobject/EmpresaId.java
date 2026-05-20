@@ -23,4 +23,9 @@ public record EmpresaId (String value) {
 
     public static EmpresaId fromExistingValue(String valor) {return new EmpresaId(valor);}
 
+    @Override
+    public String toString() {
+        return value;
+    }
+
 }
