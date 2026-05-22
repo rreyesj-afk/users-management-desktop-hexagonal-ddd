@@ -16,7 +16,7 @@ public class EmpresaModel {
     EmpresaIncorporationDate    incorporationDate;
     EmpresaAnnualBilling        annualBilling;
     EmpresaSede                 sede;
-    EmpresaSector sector;
+    EmpresaSector               sector;
 
     public static EmpresaModel create(
             final EmpresaId                 idEmpresa,
