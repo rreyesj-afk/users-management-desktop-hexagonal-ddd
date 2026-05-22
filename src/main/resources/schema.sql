@@ -3,7 +3,7 @@
 -- Gestión de Usuarios - Arquitectura Hexagonal
 -- =============================================
 
-CREATE DATABASE IF NOT EXISTS crud_usuarios
+CREATE DATABASE IF NOT EXISTS holding_db
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
