@@ -4,7 +4,7 @@ import com.jcaa.usersmanagement.domain.valueobject.EmpresaAnnualBilling;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaId;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaIncorporationDate;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaName;
-import com.jcaa.usersmanagement.domain.valueobject.EmpresaSectorMercado;
+import com.jcaa.usersmanagement.domain.valueobject.EmpresaSector;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaSede;
 import lombok.Value;
 
@@ -16,7 +16,7 @@ public class EmpresaModel {
     EmpresaIncorporationDate    incorporationDate;
     EmpresaAnnualBilling        annualBilling;
     EmpresaSede                 sede;
-    EmpresaSectorMercado        sector;
+    EmpresaSector sector;
 
     public static EmpresaModel create(
             final EmpresaId                 idEmpresa,
@@ -24,7 +24,7 @@ public class EmpresaModel {
             final EmpresaIncorporationDate  incorporationDate,
             final EmpresaAnnualBilling      annualBilling,
             final EmpresaSede               sede,
-            final EmpresaSectorMercado      sector) {
+            final EmpresaSector sector) {
 
         return new EmpresaModel(
                 idEmpresa,
@@ -57,7 +57,7 @@ public class EmpresaModel {
                 sector);
     }
 
-    public EmpresaModel changeSectorMercado(final EmpresaSectorMercado newSector) {
+    public EmpresaModel changeSector(final EmpresaSector newSector) {
 
         return new EmpresaModel(
                 idEmpresa,

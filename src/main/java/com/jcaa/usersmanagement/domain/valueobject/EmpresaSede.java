@@ -3,19 +3,19 @@ package com.jcaa.usersmanagement.domain.valueobject;
 import com.jcaa.usersmanagement.domain.exception.InvalidEmpresaSedeException;
 import java.util.Objects;
 
-public record EmpresaSede(String nameSede, String descriptionSede) {
+public record EmpresaSede(String sedeName, String sedeDescription) {
 
     private static final int MINIMUM_LENGTH = 3;
 
     public EmpresaSede {
-        nameSede = Objects.requireNonNull(nameSede,"El nombre de la sede no puede ser nulo.").trim();
-        descriptionSede = Objects.requireNonNull(descriptionSede, "La descripción de la sede no puede ser nula.").trim();
-        validateNotEmpty(nameSede, descriptionSede);
-        validateMinimumLength(nameSede);
+        sedeName = Objects.requireNonNull(sedeName,"El nombre de la sede no puede ser nulo.").trim();
+        sedeDescription = Objects.requireNonNull(sedeDescription, "La descripción de la sede no puede ser nula.").trim();
+        validateNotEmpty(sedeName, sedeDescription);
+        validateMinimumLength(sedeName);
     }
 
-    private static void validateNotEmpty(final String nameSede, final String descriptionSede) {
-        if (nameSede.isEmpty()) {throw InvalidEmpresaSedeException.becauseSedeNameIsEmpty();
+    private static void validateNotEmpty(final String sedeName, final String descriptionSede) {
+        if (sedeName.isEmpty()) {throw InvalidEmpresaSedeException.becauseSedeNameIsEmpty();
         }
         if (descriptionSede.isEmpty()) {throw InvalidEmpresaSedeException.becauseSedeDescriptionIsEmpty();
         }
@@ -26,4 +26,6 @@ public record EmpresaSede(String nameSede, String descriptionSede) {
         }
     }
 
+    @Override
+    public String toString() {return sedeName + " - " + sedeDescription;}
 }
