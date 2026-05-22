@@ -2,7 +2,7 @@ package com.jcaa.usersmanagement.domain.exception;
 
 public final class EmpresaNotFoundException extends DomainException {
 
-    public static final String MESSAGE_EMPRESA_NOT_FOUND = "Empresa not found with id '%s'";
+    private static final String MESSAGE_EMPRESA_NOT_FOUND = "Empresa not found with id '%s'";
 
     private EmpresaNotFoundException (final String message){super(message);}
 

@@ -1,6 +1,6 @@
 package com.jcaa.usersmanagement.domain.exception;
 
-public final class InvalidIncorporationDateException extends RuntimeException {
+public final class InvalidIncorporationDateException extends DomainException {
 
     private static final String MESSAGE_EMPTY = "IncorporationDate cannot be null.";
     private static final String MESSAGE_FUTURE = "IncorporationDate cannot be in the future.";
