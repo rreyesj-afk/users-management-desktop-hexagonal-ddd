@@ -3,27 +3,30 @@ package com.jcaa.usersmanagement.domain.valueobject;
 import com.jcaa.usersmanagement.domain.exception.InvalidEmpresaSectorMercadoException;
 import java.util.Objects;
 
-public record EmpresaSectorMercado(String nameSector, String descriptionSector) {
+public record EmpresaSectorMercado(String sectorName, String sectorDescription) {
 
     private static final int MINIMUM_LENGTH = 3;
 
     public EmpresaSectorMercado{
-        nameSector = Objects.requireNonNull(nameSector,"El nombre del sector no puede ser nulo.").trim();
-        descriptionSector = Objects.requireNonNull(descriptionSector, "La descripción del sector no puede ser nula.").trim();
-        validateNotEmpty(nameSector, descriptionSector);
-        validateMinimumLength(nameSector);
+        sectorName = Objects.requireNonNull(sectorName,"El nombre del sector no puede ser nulo.").trim();
+        sectorDescription = Objects.requireNonNull(sectorDescription, "La descripción del sector no puede ser nula.").trim();
+        validateNotEmpty(sectorName, sectorDescription);
+        validateMinimumLength(sectorName);
     }
 
-    private static void validateNotEmpty(final String nameSector, final String descriptionSector) {
-        if (nameSector.isEmpty()) {throw InvalidEmpresaSectorMercadoException.becauseSectorNameIsEmpty();
+    private static void validateNotEmpty(final String sectorName, final String sectorDescription) {
+        if (sectorName.isEmpty()) {throw InvalidEmpresaSectorMercadoException.becauseSectorNameIsEmpty();
         }
-        if (descriptionSector.isEmpty()) {throw InvalidEmpresaSectorMercadoException.becauseSectorDescriptionIsEmpty();
+        if (sectorDescription.isEmpty()) {throw InvalidEmpresaSectorMercadoException.becauseSectorDescriptionIsEmpty();
         }
     }
 
-    private static void validateMinimumLength(final String nameSector) {
-        if (nameSector.length() < MINIMUM_LENGTH) {throw InvalidEmpresaSectorMercadoException.becauseLengthIsTooShort(MINIMUM_LENGTH);
+    private static void validateMinimumLength(final String sectorName) {
+        if (sectorName.length() < MINIMUM_LENGTH) {throw InvalidEmpresaSectorMercadoException.becauseLengthIsTooShort(MINIMUM_LENGTH);
         }
     }
+
+    @Override
+    public String toString() {return sectorName + " - " + sectorDescription;}
 
 }
