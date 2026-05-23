@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 public record UpdateEmpresaAnnualBillingCommand(
 
         @NotBlank(message = "empresa id must not be blank")
-            String empresaId,
+            String idEmpresa,
         @NotNull(message = "annual billing must not be null")
             @Positive(message = "annual billing must be greater than zero")
             BigDecimal annualBilling
