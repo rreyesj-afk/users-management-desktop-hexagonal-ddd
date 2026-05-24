@@ -10,6 +10,8 @@ import com.jcaa.usersmanagement.domain.valueobject.EmpresaSector;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaSede;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ class EmpresaModelTest {
 
     @BeforeEach
     void setUp() {
-        idEmpresa = new EmpresaId("0001");
+        idEmpresa = new EmpresaId(UUID.randomUUID().toString());
         nameEmpresa = new EmpresaName("Fortuna");
         incorporationDate = new EmpresaIncorporationDate(LocalDate.of(2025, 4, 8));
         annualBilling = new EmpresaAnnualBilling(new BigDecimal("10000000"));

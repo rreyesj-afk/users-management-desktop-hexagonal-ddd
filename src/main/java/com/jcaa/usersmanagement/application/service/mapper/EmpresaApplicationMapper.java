@@ -66,10 +66,10 @@ public class EmpresaApplicationMapper {
     }
 
     public EmpresaId fromGetEmpresaByIdQueryToEmpresaId(final GetEmpresaByIdQuery query) {
-        return new EmpresaId(query.empresaId());
+        return new EmpresaId(query.idEmpresa());
     }
 
     public EmpresaId fromDeleteCommandToEmpresaId(final DeleteEmpresaCommand command) {
-        return new EmpresaId(command.empresaId());
+        return new EmpresaId(command.idEmpresa());
     }
 }
