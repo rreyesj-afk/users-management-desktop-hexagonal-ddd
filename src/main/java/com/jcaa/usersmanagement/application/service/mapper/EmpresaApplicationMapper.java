@@ -33,22 +33,36 @@ public class EmpresaApplicationMapper {
                         command.sectorDescription()));
     }
 
-    public EmpresaAnnualBilling fromUpdateAnnualBillingCommandToValueObject(
-            final UpdateEmpresaAnnualBillingCommand command) {
+    public EmpresaId fromUpdateAnnualBillingCommandToEmpresaId(final UpdateEmpresaAnnualBillingCommand command) {
+        return new EmpresaId(command.idEmpresa());
+    }
+        public EmpresaAnnualBilling fromUpdateAnnualBillingCommandToAnnualBilling(
+                final UpdateEmpresaAnnualBillingCommand command) {
+        return new EmpresaAnnualBilling(
+                command.annualBilling()
+            );
+        }
 
-        return new EmpresaAnnualBilling(command.annualBilling());
+    public EmpresaId fromChangeSedeCommandToEmpresaId(final ChangeEmpresaSedeCommand command) {
+        return new EmpresaId(command.idEmpresa());
     }
 
-    public EmpresaSede fromChangeSedeCommandToValueObject(final ChangeEmpresaSedeCommand command) {
+    public EmpresaSede fromChangeSedeCommandToSede(final ChangeEmpresaSedeCommand command) {
         return new EmpresaSede(
                 command.sedeName(),
-                command.sedeDescription());
+                command.sedeDescription()
+        );
     }
 
-    public EmpresaSector fromChangeSectorCommandToValueObject(final ChangeEmpresaSectorCommand command) {
+    public EmpresaId fromChangeSectorCommandToEmpresaId(final ChangeEmpresaSectorCommand command) {
+        return new EmpresaId(command.idEmpresa());
+    }
+
+    public EmpresaSector fromChangeSectorCommandToSector(final ChangeEmpresaSectorCommand command) {
         return new EmpresaSector(
                 command.sectorName(),
-                command.sectorDescription());
+                command.sectorDescription()
+        );
     }
 
     public EmpresaId fromGetEmpresaByIdQueryToEmpresaId(final GetEmpresaByIdQuery query) {
