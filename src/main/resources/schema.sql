@@ -7,7 +7,7 @@ CREATE DATABASE IF NOT EXISTS holding_db
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
 
-USE crud_usuarios;
+USE holding_db;
 
 CREATE TABLE IF NOT EXISTS users (
     id          VARCHAR(36)  NOT NULL PRIMARY KEY,
@@ -19,6 +19,27 @@ CREATE TABLE IF NOT EXISTS users (
     created_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- EMPRESA
+-- =============================================
+
+CREATE TABLE IF NOT EXISTS empresas (
+    id_empresa          VARCHAR(36)     NOT NULL PRIMARY KEY,
+    empresa_name        VARCHAR(100)    NOT NULL UNIQUE,
+    incorporation_date  DATE            NOT NULL,
+    annual_billing      DECIMAL(15,2)   NOT NULL,
+
+    sede_name           VARCHAR(100)    NOT NULL,
+    sede_description    VARCHAR(255)    NOT NULL,
+
+    sector_name         VARCHAR(100)    NOT NULL,
+    sector_description  VARCHAR(255)    NOT NULL,
+
+    created_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 
 -- Usuario administrador inicial (password: Admin1234!)
 INSERT INTO users (id, name, email, password, role, status)
