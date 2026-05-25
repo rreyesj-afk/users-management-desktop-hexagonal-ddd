@@ -3,10 +3,13 @@ package com.jcaa.usersmanagement.application.service;
 import com.jcaa.usersmanagement.application.port.in.ChangeEmpresaSectorUseCase;
 import com.jcaa.usersmanagement.application.port.out.EmpresaRepositoryPort;
 import com.jcaa.usersmanagement.application.service.dto.command.ChangeEmpresaSectorCommand;
+import com.jcaa.usersmanagement.application.service.dto.command.ChangeEmpresaSedeCommand;
+import com.jcaa.usersmanagement.application.service.mapper.EmpresaApplicationMapper;
 import com.jcaa.usersmanagement.domain.exception.EmpresaNotFoundException;
 import com.jcaa.usersmanagement.domain.model.EmpresaModel;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaId;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaSector;
+import com.jcaa.usersmanagement.domain.valueobject.EmpresaSede;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
@@ -25,15 +28,15 @@ public final class ChangeEmpresaSectorService implements ChangeEmpresaSectorUseC
 
         validateCommand(command);
 
-        final EmpresaId idEmpresa = new EmpresaId(command.idEmpresa());
-        final EmpresaModel current = findfindExistingEmpresaOrFail(idEmpresa);
-        final EmpresaSector newSector = new EmpresaSector(command.sectorName(), command.sectorDescription());
+        final EmpresaId idEmpresa = EmpresaApplicationMapper.fromChangeSectorCommandToEmpresaId(command);
+        final EmpresaModel current = findExistingEmpresaOrFail(idEmpresa);
+        final EmpresaSector newSector = EmpresaApplicationMapper.fromChangeSectorCommandToSector(command);
         final EmpresaModel empresaToUpdate = current.changeSector(newSector);
-        final EmpresaModel updatedSector = empresaRepositoryPort.save(empresaToUpdate);
+        final EmpresaModel changeSector= empresaRepositoryPort.save(empresaToUpdate);
 
-        empresaNotificationsService.notifySedeChanged(updatedSector);
+        empresaNotificationsService.notifySectorChanged(changeSector);
 
-        return empresaRepositoryPort.save(updatedSector);
+        return changeSector;
     }
 
     private void validateCommand(final ChangeEmpresaSectorCommand command) {
@@ -43,7 +46,7 @@ public final class ChangeEmpresaSectorService implements ChangeEmpresaSectorUseC
         }
     }
 
-    private EmpresaModel findfindExistingEmpresaOrFail(final EmpresaId idEmpresa) {
+    private EmpresaModel findExistingEmpresaOrFail(final EmpresaId idEmpresa) {
         return empresaRepositoryPort.findById(idEmpresa).orElseThrow(
                 () -> EmpresaNotFoundException.becauseIdWasNotFound(idEmpresa.value())
         );
