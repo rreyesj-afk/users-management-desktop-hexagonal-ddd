@@ -31,7 +31,7 @@ public final class UpdateEmpresaAnnualBillingService implements UpdateEmpresaAnn
         final EmpresaModel current = findExistingEmpresaOrFail(idEmpresa);
         final EmpresaAnnualBilling newAnnualBilling = EmpresaApplicationMapper.fromUpdateAnnualBillingCommandToAnnualBilling(command);
         final EmpresaModel empresaToUpdate = current.updateAnnualBilling(newAnnualBilling);
-        final EmpresaModel updatedEmpresa = empresaRepositoryPort.save(empresaToUpdate);
+        final EmpresaModel updatedEmpresa = empresaRepositoryPort.update(empresaToUpdate);
 
         empresaNotificationsService.notifyAnnualBillingUpdated(updatedEmpresa);
 

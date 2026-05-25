@@ -74,7 +74,7 @@ class ChangeEmpresaSectorServiceTest {
         );
 
         when(empresaRepositoryPort.findById(any())).thenReturn(Optional.of(currentEmpresa));
-        when(empresaRepositoryPort.save(any())).thenReturn(updatedEmpresa);
+        when(empresaRepositoryPort.update(any())).thenReturn(updatedEmpresa);
         // Act
         final EmpresaModel result = changeEmpresaSectorService.execute(changeEmpresaSectorCommand);
         // Assert
@@ -85,7 +85,7 @@ class ChangeEmpresaSectorServiceTest {
                 () -> assertEquals("Creación y mantenimiento de hardware.", result.getSector().sectorDescription(), "descripcion sector actualizada")
         );
 
-        verify(empresaRepositoryPort).save(any(EmpresaModel.class));
+        verify(empresaRepositoryPort).update(any(EmpresaModel.class));
         verify(empresaNotificationsService).notifySectorChanged(updatedEmpresa);
     }
 
@@ -100,7 +100,7 @@ class ChangeEmpresaSectorServiceTest {
         when(empresaRepositoryPort.findById(any())).thenReturn(Optional.empty());
         // Act & Assert
         assertThrows(EmpresaNotFoundException.class, () -> changeEmpresaSectorService.execute(changeEmpresaSectorCommand));
-        verify(empresaRepositoryPort, never()).save(any());
+        verify(empresaRepositoryPort, never()).update(any());
         verify(empresaNotificationsService, never()).notifySedeChanged(any());
     }
 
