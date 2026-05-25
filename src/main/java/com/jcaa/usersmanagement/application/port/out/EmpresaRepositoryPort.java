@@ -1,7 +1,6 @@
 package com.jcaa.usersmanagement.application.port.out;
 
 import com.jcaa.usersmanagement.domain.model.EmpresaModel;
-import com.jcaa.usersmanagement.domain.model.UserModel;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaId;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaName;
 

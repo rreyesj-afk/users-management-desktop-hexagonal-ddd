@@ -60,17 +60,17 @@ public final class PersistenceException extends RuntimeException {
   // EMPRESA
   // ==========================
 
-  public static PersistenceException becauseEmpresaSaveFailed(final String empresaId, final Throwable cause) {
-    return new PersistenceException(String.format(MESSAGE_EMPRESA_SAVE, empresaId), cause);
+  public static PersistenceException becauseEmpresaSaveFailed(final String idEmpresa, final Throwable cause) {
+    return new PersistenceException(String.format(MESSAGE_EMPRESA_SAVE, idEmpresa), cause);
   }
 
-  public static PersistenceException becauseEmpresaUpdateFailed(final String empresaId, final Throwable cause) {
-   return new PersistenceException(String.format(MESSAGE_EMPRESA_UPDATE, empresaId), cause
+  public static PersistenceException becauseEmpresaUpdateFailed(final String idEmpresa, final Throwable cause) {
+   return new PersistenceException(String.format(MESSAGE_EMPRESA_UPDATE, idEmpresa), cause
     );
   }
 
-  public static PersistenceException becauseEmpresaFindByIdFailed(final String empresaId, final Throwable cause) {
-    return new PersistenceException(String.format(MESSAGE_EMPRESA_FIND, empresaId), cause);
+  public static PersistenceException becauseEmpresaFindByIdFailed(final String idEmpresa, final Throwable cause) {
+    return new PersistenceException(String.format(MESSAGE_EMPRESA_FIND, idEmpresa), cause);
   }
 
   public static PersistenceException becauseFindByNameFailed(final String empresaName, final Throwable cause) {
@@ -81,8 +81,8 @@ public final class PersistenceException extends RuntimeException {
     return new PersistenceException(MESSAGE_EMPRESA_ALL, cause);
   }
 
-  public static PersistenceException becauseEmpresaDeleteFailed(final String empresaId, final Throwable cause) {
-    return new PersistenceException(String.format(MESSAGE_EMPRESA_DELETE, empresaId), cause
+  public static PersistenceException becauseEmpresaDeleteFailed(final String idEmpresa, final Throwable cause) {
+    return new PersistenceException(String.format(MESSAGE_EMPRESA_DELETE, idEmpresa), cause
     );
   }
 
