@@ -30,7 +30,7 @@ public final class ChangeEmpresaSedeService implements ChangeEmpresaSedeUseCase 
         final EmpresaModel current = findExistingEmpresaOrFail(idEmpresa);
         final EmpresaSede newSede = EmpresaApplicationMapper.fromChangeSedeCommandToSede(command);
         final EmpresaModel empresaToUpdate = current.changeSede(newSede);
-        final EmpresaModel changeSede = empresaRepositoryPort.save(empresaToUpdate);
+        final EmpresaModel changeSede = empresaRepositoryPort.update(empresaToUpdate);
 
         empresaNotificationsService.notifySedeChanged(changeSede);
 

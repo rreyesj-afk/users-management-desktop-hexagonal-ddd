@@ -73,7 +73,7 @@ class UpdateEmpresaAnnualBillingServiceTest {
 
         when(empresaRepositoryPort.findById(any())).thenReturn(Optional.of(currentEmpresa));
 
-        when(empresaRepositoryPort.save(any())).thenReturn(updatedEmpresa);
+        when(empresaRepositoryPort.update(any())).thenReturn(updatedEmpresa);
 
         // Act
         final EmpresaModel result = updateEmpresaAnnualBillingService.execute(updateEmpresaAnnualBillingCommand);
@@ -85,7 +85,7 @@ class UpdateEmpresaAnnualBillingServiceTest {
                 () -> assertEquals(new BigDecimal("25000000"), result.getAnnualBilling().value(), "facturación anual actualizada")
         );
 
-        verify(empresaRepositoryPort).save(any(EmpresaModel.class));
+        verify(empresaRepositoryPort).update(any(EmpresaModel.class));
         verify(empresaNotificationsService).notifyAnnualBillingUpdated(updatedEmpresa);
     }
 
@@ -100,7 +100,7 @@ class UpdateEmpresaAnnualBillingServiceTest {
         when(empresaRepositoryPort.findById(any())).thenReturn(Optional.empty());
         // Act & Assert
         assertThrows(EmpresaNotFoundException.class, () -> updateEmpresaAnnualBillingService.execute(updateEmpresaAnnualBillingCommand));
-        verify(empresaRepositoryPort, never()).save(any());
+        verify(empresaRepositoryPort, never()).update(any());
         verify(empresaNotificationsService, never()).notifyAnnualBillingUpdated(any());
     }
 

@@ -74,7 +74,7 @@ class ChangeEmpresaSedeServiceTest {
         );
 
         when(empresaRepositoryPort.findById(any())).thenReturn(Optional.of(currentEmpresa));
-        when(empresaRepositoryPort.save(any())).thenReturn(updatedEmpresa);
+        when(empresaRepositoryPort.update(any())).thenReturn(updatedEmpresa);
         // Act
         final EmpresaModel result = changeEmpresaSedeService.execute(changeEmpresaSedeCommand);
         // Assert
@@ -85,7 +85,7 @@ class ChangeEmpresaSedeServiceTest {
                 () -> assertEquals("Enfocada en hardware.", result.getSede().sedeDescription(), "descripcion sede actualizada")
         );
 
-        verify(empresaRepositoryPort).save(any(EmpresaModel.class));
+        verify(empresaRepositoryPort).update(any(EmpresaModel.class));
         verify(empresaNotificationsService).notifySedeChanged(updatedEmpresa);
     }
 
@@ -100,7 +100,7 @@ class ChangeEmpresaSedeServiceTest {
         when(empresaRepositoryPort.findById(any())).thenReturn(Optional.empty());
         // Act & Assert
         assertThrows(EmpresaNotFoundException.class, () -> changeEmpresaSedeService.execute(changeEmpresaSedeCommand));
-        verify(empresaRepositoryPort, never()).save(any());
+        verify(empresaRepositoryPort, never()).update(any());
         verify(empresaNotificationsService, never()).notifySedeChanged(any());
     }
 

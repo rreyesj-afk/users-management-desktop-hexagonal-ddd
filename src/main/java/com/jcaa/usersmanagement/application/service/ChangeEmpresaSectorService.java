@@ -32,7 +32,7 @@ public final class ChangeEmpresaSectorService implements ChangeEmpresaSectorUseC
         final EmpresaModel current = findExistingEmpresaOrFail(idEmpresa);
         final EmpresaSector newSector = EmpresaApplicationMapper.fromChangeSectorCommandToSector(command);
         final EmpresaModel empresaToUpdate = current.changeSector(newSector);
-        final EmpresaModel changeSector= empresaRepositoryPort.save(empresaToUpdate);
+        final EmpresaModel changeSector= empresaRepositoryPort.update(empresaToUpdate);
 
         empresaNotificationsService.notifySectorChanged(changeSector);
 
