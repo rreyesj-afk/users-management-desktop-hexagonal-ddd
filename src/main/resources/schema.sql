@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- =============================================
 
 CREATE TABLE IF NOT EXISTS empresas (
-    id_empresa          VARCHAR(36)     NOT NULL PRIMARY KEY,
+    id_empresa          BIGINT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
     empresa_name        VARCHAR(100)    NOT NULL UNIQUE,
     incorporation_date  DATE            NOT NULL,
     annual_billing      DECIMAL(15,2)   NOT NULL,
