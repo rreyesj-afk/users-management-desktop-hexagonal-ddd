@@ -39,8 +39,6 @@ class ChangeEmpresaSectorServiceTest {
 
     private ChangeEmpresaSectorService changeEmpresaSectorService;
 
-    final String idEmpresa = UUID.randomUUID().toString();
-
     @BeforeEach
     void setUp() {
         try (final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
@@ -58,10 +56,10 @@ class ChangeEmpresaSectorServiceTest {
     @DisplayName("execute() cambia el sector y notifica cuando empresa existe")
     void shouldChangeSectorAndNotify() {
         // Arrange
-        final ChangeEmpresaSectorCommand changeEmpresaSectorCommand = new ChangeEmpresaSectorCommand(idEmpresa, "Hardware", "Creación y mantenimiento de hardware.");
+        final ChangeEmpresaSectorCommand changeEmpresaSectorCommand = new ChangeEmpresaSectorCommand("1", "Hardware", "Creación y mantenimiento de hardware.");
 
         final EmpresaModel currentEmpresa = EmpresaModel.create(
-                new EmpresaId(idEmpresa),
+                new EmpresaId("1"),
                 new EmpresaName("Fortuna"),
                 new EmpresaIncorporationDate(LocalDate.of(2025, 4, 8)),
                 new EmpresaAnnualBilling(new BigDecimal("10000000")),
@@ -80,7 +78,7 @@ class ChangeEmpresaSectorServiceTest {
         // Assert
         assertAll("flujo feliz change sector",
                 () -> assertNotNull(result, "resultado no debe ser null"),
-                () -> assertEquals(idEmpresa, result.getIdEmpresa().value(), "id empresa"),
+                () -> assertEquals("1", result.getIdEmpresa().value(), "id empresa"),
                 () -> assertEquals("Hardware", result.getSector().sectorName(), "nombre sector actualizado"),
                 () -> assertEquals("Creación y mantenimiento de hardware.", result.getSector().sectorDescription(), "descripcion sector actualizada")
         );

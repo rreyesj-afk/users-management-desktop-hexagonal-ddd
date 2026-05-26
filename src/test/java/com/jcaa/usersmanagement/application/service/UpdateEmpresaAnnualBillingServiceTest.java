@@ -39,8 +39,6 @@ class UpdateEmpresaAnnualBillingServiceTest {
 
     private UpdateEmpresaAnnualBillingService updateEmpresaAnnualBillingService;
 
-    final String idEmpresa =  UUID.randomUUID().toString();
-
     @BeforeEach
     void setUp() {
         try (final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
@@ -58,10 +56,10 @@ class UpdateEmpresaAnnualBillingServiceTest {
     @DisplayName("execute() actualiza annual billing y notifica cuando la empresa existe")
     void shouldUpdateAnnualBillingAndNotify() {
         // Arrange
-        final UpdateEmpresaAnnualBillingCommand updateEmpresaAnnualBillingCommand = new UpdateEmpresaAnnualBillingCommand(idEmpresa, new BigDecimal("2500000"));
+        final UpdateEmpresaAnnualBillingCommand updateEmpresaAnnualBillingCommand = new UpdateEmpresaAnnualBillingCommand("1", new BigDecimal("2500000"));
 
         final EmpresaModel currentEmpresa = EmpresaModel.create(
-                new EmpresaId(idEmpresa),
+                new EmpresaId("1"),
                 new EmpresaName("Fortuna"),
                 new EmpresaIncorporationDate(LocalDate.of(2025, 4, 8)),
                 new EmpresaAnnualBilling(new BigDecimal("10000000")),
@@ -81,7 +79,7 @@ class UpdateEmpresaAnnualBillingServiceTest {
         // Assert
         assertAll("flujo feliz update annual billing",
                 () -> assertNotNull(result, "resultado no debe ser null"),
-                () -> assertEquals(idEmpresa, result.getIdEmpresa().value(), "id empresa"),
+                () -> assertEquals("1", result.getIdEmpresa().value(), "id empresa"),
                 () -> assertEquals(new BigDecimal("25000000"), result.getAnnualBilling().value(), "facturación anual actualizada")
         );
 
