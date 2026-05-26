@@ -33,7 +33,7 @@ public class EmpresaPersistenceMapper {
 
     public EmpresaEntity fromResultSetToEntity(final ResultSet resultSet) throws SQLException {
         return new EmpresaEntity(
-                resultSet.getString("id_empresa"),
+                String.valueOf(resultSet.getInt("id_empresa")),
                 resultSet.getString("name_empresa"),
                 resultSet.getString("incorporation_date"),
                 resultSet.getString("annual_billing"),

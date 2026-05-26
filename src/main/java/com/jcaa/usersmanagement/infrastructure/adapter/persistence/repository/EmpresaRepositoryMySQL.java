@@ -12,10 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +22,8 @@ public final class EmpresaRepositoryMySQL implements EmpresaRepositoryPort {
 
     private static final String INSERT_SQL =
             "INSERT INTO empresas "
-            + "(id_empresa, empresa_name, incorporation_date, annual_billing, sede_name, sede_description, sector_name, sector_description, created_at, updated_at)"
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
+            + "(empresa_name, incorporation_date, annual_billing, sede_name, sede_description, sector_name, sector_description, created_at, updated_at)"
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())";
 
     private static final String UPDATE_SQL =
             "UPDATE empresas SET empresa_name = ?, incorporation_date = ?, annual_billing = ?, sede_name = ?, sede_description = ?, sector_name = ?, sector_description = ?, updated_at = NOW()"
@@ -55,8 +52,8 @@ public final class EmpresaRepositoryMySQL implements EmpresaRepositoryPort {
     @Override
     public EmpresaModel save(final EmpresaModel empresa) {
         final EmpresaPersistenceDto dto = EmpresaPersistenceMapper.fromModelToDto(empresa);
-        executeSave(dto);
-        return findByIdOrFail(empresa.getIdEmpresa());
+        final String generatedId = executeSave(dto);
+        return findByIdOrFail(new EmpresaId(generatedId));
     }
 
     @Override
@@ -124,18 +121,25 @@ public final class EmpresaRepositoryMySQL implements EmpresaRepositoryPort {
         }
     }
 
-    private void executeSave(
-            final EmpresaPersistenceDto dto) {
-        try (final PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
-            statement.setString(1, dto.idEmpresa());
-            statement.setString(2, dto.nameEmpresa());
-            statement.setString(3, dto.incorporationDate());
-            statement.setBigDecimal(4, new BigDecimal(dto.annualBilling()));
-            statement.setString(5, dto.sedeName());
-            statement.setString(6, dto.sedeDescription());
-            statement.setString(7, dto.sectorName());
-            statement.setString(8, dto.sectorDescription());
+    private String executeSave(final EmpresaPersistenceDto dto) {
+        try (final PreparedStatement statement = connection.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+            statement.setString(1, dto.nameEmpresa());
+            statement.setString(2, dto.incorporationDate());
+            statement.setString(3, dto.annualBilling());
+            statement.setString(4, dto.sedeName());
+            statement.setString(5, dto.sedeDescription());
+            statement.setString(6, dto.sectorName());
+            statement.setString(7, dto.sectorDescription());
             statement.executeUpdate();
+
+            try (final ResultSet keys = statement.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return String.valueOf(keys.getInt(1));
+                }
+
+                throw new SQLException("Could not retrieve generated ID");
+            }
+
         }
 
         catch (final SQLException exception) {

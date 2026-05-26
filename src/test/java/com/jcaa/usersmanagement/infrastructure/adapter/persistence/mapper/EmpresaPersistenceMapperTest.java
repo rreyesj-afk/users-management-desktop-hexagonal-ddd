@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class EmpresaPersistenceMapperTest {
 
-    private static final String EMPRESA_ID = UUID.randomUUID().toString();
+    private static final String EMPRESA_ID = "0";
     private static final String EMPRESA_NAME = "Fortuna";
     private static final LocalDate INCORPORATION_DATE = LocalDate.of(2025,4,8);
     private static final BigDecimal ANNUAL_BILLING = (new BigDecimal("1000000"));
@@ -116,7 +116,7 @@ class EmpresaPersistenceMapperTest {
     @DisplayName("fromResultSetToEntity() lee todas las columnas del ResulSet")
     void shouldReadAllCollumnsFromResultSet() throws SQLException {
         //Arrange
-        when(resultSet.getString("id_empresa")).thenReturn(EMPRESA_ID);
+        when(resultSet.getInt("id_empresa")).thenReturn(Integer.parseInt(EMPRESA_ID));
         when(resultSet.getString("name_empresa")).thenReturn(EMPRESA_NAME);
         when(resultSet.getString("incorporation_date")).thenReturn(INCORPORATION_DATE.toString());
         when(resultSet.getString("annual_billing")).thenReturn(ANNUAL_BILLING.toString());
@@ -176,7 +176,7 @@ class EmpresaPersistenceMapperTest {
     void shouldReturnOneModelPerRow() throws SQLException {
         //Arrange
         when(resultSet.next()).thenReturn(true, true, false);
-        when(resultSet.getString("id_empresa")).thenReturn(EMPRESA_ID);
+        when(resultSet.getInt("id_empresa")).thenReturn(Integer.parseInt(EMPRESA_ID));
         when(resultSet.getString("name_empresa")).thenReturn(EMPRESA_NAME);
         when(resultSet.getString("incorporation_date")).thenReturn(INCORPORATION_DATE.toString());
         when(resultSet.getString("annual_billing")).thenReturn(ANNUAL_BILLING.toString());
