@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class EmpresaAnnualBillingUpdatedDomainEventTest {
 
-    private static final String ID_EMPRESA = UUID.randomUUID().toString();
+    private static final String ID_EMPRESA = "1";
     private static final String EMPRESA_NAME = "Fortuna";
     private static final LocalDate EMPRESA_INCORPORATION_DATE = LocalDate.of(2025, 4, 8);
     private static final String EMPRESA_ANNUAL_BILLING = "20000000";
