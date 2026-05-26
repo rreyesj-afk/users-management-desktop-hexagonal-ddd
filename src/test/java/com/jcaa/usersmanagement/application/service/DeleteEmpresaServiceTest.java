@@ -33,8 +33,6 @@ class DeleteEmpresaServiceTest {
 
     private DeleteEmpresaService deleteEmpresaService;
 
-    final String idEmpresa = UUID.randomUUID().toString();
-
     @BeforeEach
     void setUp() {
         try(final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
@@ -48,10 +46,10 @@ class DeleteEmpresaServiceTest {
     @DisplayName("execute() invoca empresaRepositoryPort cuando la empresa existe")
     void shouldDeleteWhenEmpresaExists() {
         //Arrange
-        final DeleteEmpresaCommand deleteEmpresaCommand = new DeleteEmpresaCommand(idEmpresa);
+        final DeleteEmpresaCommand deleteEmpresaCommand = new DeleteEmpresaCommand("1");
 
          final EmpresaModel existingEmpresa = new EmpresaModel(
-                 new EmpresaId(idEmpresa),
+                 new EmpresaId("1"),
                  new EmpresaName("Fortuna"),
                  new EmpresaIncorporationDate(LocalDate.of(2025, 4, 8)),
                  new EmpresaAnnualBilling(new BigDecimal("10000000")),
@@ -63,7 +61,7 @@ class DeleteEmpresaServiceTest {
          //Act
         deleteEmpresaService.execute(deleteEmpresaCommand);
         //Assert
-        verify(empresaRepositoryPort).delete(new EmpresaId(idEmpresa));
+        verify(empresaRepositoryPort).delete(new EmpresaId("1"));
    }
 
    // empresa no encontrada

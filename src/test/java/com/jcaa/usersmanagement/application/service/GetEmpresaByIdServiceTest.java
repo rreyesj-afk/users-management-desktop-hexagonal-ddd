@@ -33,8 +33,6 @@ class GetEmpresaByIdServiceTest {
 
     private GetEmpresaByIdService getEmpresaByIdService;
 
-    final String idEmpresa = UUID.randomUUID().toString();
-
     @BeforeEach
     void setUp() {
         try(final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
@@ -48,10 +46,10 @@ class GetEmpresaByIdServiceTest {
     @DisplayName("execute() retorna la empresa cuando el id existe")
     void shouldReturnEmpresaWhenFound() {
         //Arrange
-        final GetEmpresaByIdQuery query = new GetEmpresaByIdQuery(idEmpresa);
+        final GetEmpresaByIdQuery query = new GetEmpresaByIdQuery("1");
 
         final EmpresaModel expected = new EmpresaModel(
-                new EmpresaId(idEmpresa),
+                new EmpresaId("1"),
                 new EmpresaName("Fortuna"),
                 new EmpresaIncorporationDate(LocalDate.of(2025,4,8)),
                 new EmpresaAnnualBilling(new BigDecimal("10000000")),

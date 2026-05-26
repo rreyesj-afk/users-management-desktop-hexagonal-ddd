@@ -30,13 +30,11 @@ class EmpresaNotificationsServiceTest {
     private EmpresaModel empresa;
     private TestLogHandler logHandler;
 
-    final String idEmpresa = UUID.randomUUID().toString();
-
     @BeforeEach
     void setUp() {
         service = new EmpresaNotificationsService();
         empresa = EmpresaModel.create(
-                new EmpresaId(idEmpresa),
+                new EmpresaId("1"),
                 new EmpresaName("Fortuna"),
                 new EmpresaIncorporationDate(LocalDate.of(2025, 4, 8)),
                 new EmpresaAnnualBilling(new BigDecimal("10000000")),
