@@ -2,7 +2,6 @@ package com.jcaa.usersmanagement.domain.valueobject;
 
 import com.jcaa.usersmanagement.domain.exception.InvalidEmpresaIdException;
 import java.util.Objects;
-import java.util.UUID;
 
 public record EmpresaId (String value) {
 
@@ -18,10 +17,7 @@ public record EmpresaId (String value) {
         }
     }
 
-    //Genera un ID nuevo y único cada vez que se llama
-    public static EmpresaId newId() {return new EmpresaId(UUID.randomUUID().toString());}
-
-    public static EmpresaId fromExistingValue(String valor) {return new EmpresaId(valor);}
+    public static EmpresaId fromExistingValue(final String value) {return new EmpresaId(value);}
 
     @Override
     public String toString() {
