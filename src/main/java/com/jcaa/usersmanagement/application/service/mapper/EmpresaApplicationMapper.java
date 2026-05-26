@@ -21,7 +21,7 @@ public class EmpresaApplicationMapper {
     public EmpresaModel fromCreateCommandToModel(final CreateEmpresaCommand command) {
 
         return EmpresaModel.create(
-                EmpresaId.newId(),
+                new EmpresaId("0"),
                 new EmpresaName(command.nameEmpresa()),
                 new EmpresaIncorporationDate(command.incorporationDate()),
                 new EmpresaAnnualBilling(command.annualBilling()),
@@ -30,7 +30,9 @@ public class EmpresaApplicationMapper {
                         command.sedeDescription()),
                 new EmpresaSector(
                         command.sectorName(),
-                        command.sectorDescription()));
+                        command.sectorDescription()
+                )
+        );
     }
 
     public EmpresaId fromUpdateAnnualBillingCommandToEmpresaId(final UpdateEmpresaAnnualBillingCommand command) {
