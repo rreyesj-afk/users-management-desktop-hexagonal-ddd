@@ -39,8 +39,6 @@ class ChangeEmpresaSedeServiceTest {
 
     private ChangeEmpresaSedeService changeEmpresaSedeService;
 
-    final String idEmpresa = UUID.randomUUID().toString();
-
     @BeforeEach
     void setUp() {
         try (final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
@@ -58,10 +56,10 @@ class ChangeEmpresaSedeServiceTest {
     @DisplayName("execute() cambia sede y notifica cuando empresa existe")
     void shouldChangeSedeAndNotify() {
         // Arrange
-        final ChangeEmpresaSedeCommand changeEmpresaSedeCommand = new ChangeEmpresaSedeCommand(idEmpresa, "Clouur", "Enfocada en hardware.");
+        final ChangeEmpresaSedeCommand changeEmpresaSedeCommand = new ChangeEmpresaSedeCommand("1", "Clouur", "Enfocada en hardware.");
 
         final EmpresaModel currentEmpresa = EmpresaModel.create(
-                new EmpresaId(idEmpresa),
+                new EmpresaId("1"),
                 new EmpresaName("Fortuna"),
                 new EmpresaIncorporationDate(LocalDate.of(2025, 4, 8)),
                 new EmpresaAnnualBilling(new BigDecimal("10000000")),
@@ -80,7 +78,7 @@ class ChangeEmpresaSedeServiceTest {
         // Assert
         assertAll("flujo feliz change sede",
                 () -> assertNotNull(result, "resultado no debe ser null"),
-                () -> assertEquals(idEmpresa, result.getIdEmpresa().value(), "id empresa"),
+                () -> assertEquals("1", result.getIdEmpresa().value(), "id empresa"),
                 () -> assertEquals("Clouur", result.getSede().sedeName(), "nombre sede actualizado"),
                 () -> assertEquals("Enfocada en hardware.", result.getSede().sedeDescription(), "descripcion sede actualizada")
         );

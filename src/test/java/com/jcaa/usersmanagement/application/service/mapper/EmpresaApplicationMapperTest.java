@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("EmpresaApplicationMapper")
 class EmpresaApplicationMapperTest {
 
-    private static final String     EMPRESA_ID              = UUID.randomUUID().toString();
+    private static final String     EMPRESA_ID              = "0001";
     private static final String     EMPRESA_NAME            = "Fortuna";
     private static final LocalDate  INCORPORATION_DATE      = LocalDate.of(2025, 4, 8);
     private static final BigDecimal ANNUAL_BILLING          = new BigDecimal("10000000");
@@ -48,7 +48,7 @@ class EmpresaApplicationMapperTest {
         final EmpresaModel result = EmpresaApplicationMapper.fromCreateCommandToModel(command);
         // Assert
         assertAll("mapped empresa model",
-                () -> assertNotNull(                    result.getIdEmpresa()),
+                () -> assertEquals("0",        result.getIdEmpresa().value(),              "idEmpresa"),
                 () -> assertEquals(EMPRESA_NAME,        result.getNameEmpresa().value(),            "nameEmpresa"),
                 () -> assertEquals(INCORPORATION_DATE,  result.getIncorporationDate().value(),      "incorporationDate"),
                 () -> assertEquals(ANNUAL_BILLING,      result.getAnnualBilling().value(),          "annualBilling"),

@@ -28,8 +28,6 @@ class GetAllEmpresasServiceTest {
 
     private GetAllEmpresasService getAllEmpresasService;
 
-    final String idEmpresa = UUID.randomUUID().toString();
-
     @BeforeEach
     void setUp() {
         getAllEmpresasService = new GetAllEmpresasService(empresaRepositoryPort);
@@ -41,7 +39,7 @@ class GetAllEmpresasServiceTest {
     void shouldReturnEmpresasFromPort() {
         //Arrange
         final EmpresaModel empresas = new EmpresaModel(
-                new EmpresaId(idEmpresa),
+                new EmpresaId("1"),
                 new EmpresaName("Fortuna"),
                 new EmpresaIncorporationDate(LocalDate.of(2025, 4, 8)),
                 new EmpresaAnnualBilling(new BigDecimal("10000000")),

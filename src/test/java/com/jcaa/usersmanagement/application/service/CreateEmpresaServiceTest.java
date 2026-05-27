@@ -34,8 +34,6 @@ class CreateEmpresaServiceTest {
     private EmpresaNotificationsService empresaNotificationService;
     private CreateEmpresaService createEmpresaService;
 
-    final String idEmpresa = UUID.randomUUID().toString();
-
     @BeforeEach
     void setUp() {
         try (final ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory()) {
@@ -62,7 +60,7 @@ class CreateEmpresaServiceTest {
                 "Desarrollo de software");
 
         final EmpresaModel savedEmpresa = EmpresaModel.create(
-                new EmpresaId(idEmpresa),
+                new EmpresaId("1"),
                 new EmpresaName("Fortuna"),
                 new EmpresaIncorporationDate(LocalDate.of(2025, 4, 8)),
                 new EmpresaAnnualBilling(new BigDecimal("1000000")),
@@ -77,7 +75,7 @@ class CreateEmpresaServiceTest {
         assertAll("flujo feliz CreateEmpresaService",
                 () -> assertNotNull(result, "resultado no debe ser null"),
                 () -> assertEquals("Fortuna", result.getNameEmpresa().value(), "nombre empresa"),
-                () -> assertEquals(idEmpresa, result.getIdEmpresa().value(), "id empresa"));
+                () -> assertEquals("1", result.getIdEmpresa().value(), "id empresa"));
         verify(empresaRepositoryPort).save(any(EmpresaModel.class));
         verify(empresaNotificationService).notifyEmpresaCreated(savedEmpresa);
     }
@@ -98,7 +96,7 @@ class CreateEmpresaServiceTest {
                 "Desarrollo de software.");
 
         final EmpresaModel existingEmpresa = EmpresaModel.create(
-                new EmpresaId(idEmpresa),
+                new EmpresaId("1"),
                 new EmpresaName("Fouver"),
                 new EmpresaIncorporationDate(LocalDate.of(2025, 4, 8)),
                 new EmpresaAnnualBilling(new BigDecimal("1000000")),
