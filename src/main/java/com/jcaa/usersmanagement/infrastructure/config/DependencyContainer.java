@@ -1,23 +1,14 @@
 package com.jcaa.usersmanagement.infrastructure.config;
 
-import com.jcaa.usersmanagement.application.port.in.CreateUserUseCase;
-import com.jcaa.usersmanagement.application.port.in.DeleteUserUseCase;
-import com.jcaa.usersmanagement.application.port.in.GetAllUsersUseCase;
-import com.jcaa.usersmanagement.application.port.in.GetUserByIdUseCase;
-import com.jcaa.usersmanagement.application.port.in.LoginUseCase;
-import com.jcaa.usersmanagement.application.port.in.UpdateUserUseCase;
-import com.jcaa.usersmanagement.application.service.CreateUserService;
-import com.jcaa.usersmanagement.application.service.DeleteUserService;
-import com.jcaa.usersmanagement.application.service.EmailNotificationService;
-import com.jcaa.usersmanagement.application.service.GetAllUsersService;
-import com.jcaa.usersmanagement.application.service.GetUserByIdService;
-import com.jcaa.usersmanagement.application.service.LoginService;
-import com.jcaa.usersmanagement.application.service.UpdateUserService;
+import com.jcaa.usersmanagement.application.port.in.*;
+import com.jcaa.usersmanagement.application.service.*;
 import com.jcaa.usersmanagement.infrastructure.adapter.email.JavaMailEmailSenderAdapter;
 import com.jcaa.usersmanagement.infrastructure.adapter.email.SmtpConfig;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.config.DatabaseConfig;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.config.DatabaseConnectionFactory;
+import com.jcaa.usersmanagement.infrastructure.adapter.persistence.repository.EmpresaRepositoryMySQL;
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.repository.UserRepositoryMySQL;
+import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.EmpresaController;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.UserController;
 
 import java.sql.Connection;
@@ -39,19 +30,29 @@ public final class DependencyContainer {
   private static final String SMTP_FROM_NAME = "smtp.from.name";
 
   private final UserController userController;
+  private final EmpresaController empresaController;
 
   public DependencyContainer() {
     final AppProperties properties = new AppProperties();
 
     final Connection connection = buildDatabaseConnection(properties);
+    // user
     final UserRepositoryMySQL userRepository = new UserRepositoryMySQL(connection);
-
+    //empresa
+    final EmpresaRepositoryMySQL empresaRepository = new EmpresaRepositoryMySQL(connection);
+    //user
     final JavaMailEmailSenderAdapter emailSender =
         new JavaMailEmailSenderAdapter(buildSmtpConfig(properties));
     final EmailNotificationService emailNotification = new EmailNotificationService(emailSender);
+    //empres
+    final EmpresaNotificationsService empresaNotificationsService = new EmpresaNotificationsService();
 
     // Construir Validator para las validaciones en la capa de aplicación
     final Validator validator = ValidatorProvider.buildValidator();
+
+    // ==========================
+    // USER USE CASES
+    // ==========================
 
     final CreateUserUseCase createUserUseCase =
         new CreateUserService(userRepository, userRepository, emailNotification, validator);
@@ -63,6 +64,31 @@ public final class DependencyContainer {
     final GetAllUsersUseCase getAllUsersUseCase = new GetAllUsersService(userRepository);
     final LoginUseCase loginUseCase = new LoginService(userRepository, validator);
 
+    // ==========================
+    // EMPRESA USE CASES
+    // ==========================
+
+    final CreateEmpresaUseCase createEmpresaUseCase = new CreateEmpresaService(
+            empresaRepository, empresaNotificationsService, validator);
+    final UpdateEmpresaAnnualBillingUseCase updateEmpresaAnnualBillingUseCase = new UpdateEmpresaAnnualBillingService(
+            empresaRepository, empresaNotificationsService, validator);
+    final ChangeEmpresaSedeUseCase changeEmpresaSedeUseCase = new ChangeEmpresaSedeService(
+            empresaRepository, empresaNotificationsService, validator);
+    final ChangeEmpresaSectorUseCase changeEmpresaSectorUseCase = new ChangeEmpresaSectorService(
+            empresaRepository, empresaNotificationsService, validator);
+    final GetEmpresaByIdUseCase getEmpresaByIdUseCase = new GetEmpresaByIdService(
+            empresaRepository, validator);
+    final GetAllEmpresasUseCase getAllEmpresasUseCase = new GetAllEmpresasService(
+            empresaRepository);
+
+    final DeleteEmpresaUseCase deleteEmpresaUseCase = new DeleteEmpresaService(
+            empresaRepository, validator);
+
+    // ==========================
+    // CONTROLLERS
+    // ==========================
+
+    //user
     this.userController =
         new UserController(
             createUserUseCase,
@@ -71,10 +97,26 @@ public final class DependencyContainer {
             getUserByIdUseCase,
             getAllUsersUseCase,
             loginUseCase);
+
+    //empresa
+    this.empresaController =
+            new EmpresaController(
+                    createEmpresaUseCase,
+                    updateEmpresaAnnualBillingUseCase,
+                    changeEmpresaSedeUseCase,
+                    changeEmpresaSectorUseCase,
+                    getEmpresaByIdUseCase,
+                    getAllEmpresasUseCase,
+                    deleteEmpresaUseCase
+            );
   }
 
   public UserController userController() {
     return userController;
+  }
+
+  public EmpresaController empresaController() {
+    return empresaController;
   }
 
   private static Connection buildDatabaseConnection(final AppProperties properties) {
