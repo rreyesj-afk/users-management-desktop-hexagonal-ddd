@@ -28,9 +28,9 @@ class EmpresaIdTest {
 
     @Test
     @DisplayName("Valida que se genere una ID válida")
-    void shouldGenerateValidUuid() {
-        final EmpresaId empresaId = EmpresaId.newId();
-        assertDoesNotThrow(() -> UUID.fromString(empresaId.value()));
+    void shouldCreateValidEmpresaId() {
+        assertDoesNotThrow(() -> new EmpresaId("1")
+        );
     }
 
     @Test
@@ -45,15 +45,5 @@ class EmpresaIdTest {
     void shouldThrowInvalidEmpresaIdExceptionWhenEmpresaIdIsEmpty(final String input) {
         // Act & Assert
         assertThrows(InvalidEmpresaIdException.class, () -> new EmpresaId(input));
-    }
-
-    @Test
-    @DisplayName("Valida que se generen IDs diferentes") void shouldGenerateDifferentIds() {
-        // Arrange
-        final EmpresaId firstId = EmpresaId.newId();
-        // Act
-        final EmpresaId secondId = EmpresaId.newId();
-        // Assert
-        assertNotEquals(firstId, secondId);
     }
 }
