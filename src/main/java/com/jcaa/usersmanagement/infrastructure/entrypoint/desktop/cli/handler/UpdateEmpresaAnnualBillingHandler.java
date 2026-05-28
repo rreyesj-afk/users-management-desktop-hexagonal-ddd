@@ -10,7 +10,7 @@ import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.dto.UpdateEmpr
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class UpdateEmpresaAnnualBillingHandler implements OperationHandler {
+public final class UpdateEmpresaAnnualBillingHandler implements OperationHandler {
 
     private final EmpresaController empresaController;
     private final ConsoleIO empresaConsole;

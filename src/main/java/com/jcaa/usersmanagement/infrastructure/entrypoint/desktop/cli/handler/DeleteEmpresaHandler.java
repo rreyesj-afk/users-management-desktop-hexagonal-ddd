@@ -7,7 +7,7 @@ import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.Emp
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class DeleteEmpresaHandler implements OperationHandler{
+public final class DeleteEmpresaHandler implements OperationHandler{
 
     private final EmpresaController empresaController;
     private final ConsoleIO empresaConsole;

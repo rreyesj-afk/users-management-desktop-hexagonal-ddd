@@ -10,7 +10,7 @@ import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.dto.EmpresaRes
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class ChangeEmpresaSectorHandler implements OperationHandler{
+public final class ChangeEmpresaSectorHandler implements OperationHandler{
 
     private final EmpresaController empresaController;
     private final ConsoleIO empresaConsole;

@@ -8,7 +8,7 @@ import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.dto.EmpresaRes
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class FindEmpresaByIdHandler implements OperationHandler {
+public final class FindEmpresaByIdHandler implements OperationHandler {
 
     private final EmpresaController empresaController;
     private final ConsoleIO empresaConsole;
