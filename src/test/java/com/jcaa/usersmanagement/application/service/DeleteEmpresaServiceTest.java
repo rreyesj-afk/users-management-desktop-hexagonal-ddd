@@ -57,11 +57,11 @@ class DeleteEmpresaServiceTest {
                  new EmpresaSector("Tecnología.", "Desarrollo de software.")
          );
 
-         when(empresaRepositoryPort.findById(any())).thenReturn(Optional.of(existingEmpresa));
+         when(empresaRepositoryPort.findEmpresaById(any())).thenReturn(Optional.of(existingEmpresa));
          //Act
         deleteEmpresaService.execute(deleteEmpresaCommand);
         //Assert
-        verify(empresaRepositoryPort).delete(new EmpresaId("1"));
+        verify(empresaRepositoryPort).deleteEmpresa(new EmpresaId("1"));
    }
 
    // empresa no encontrada
@@ -72,16 +72,16 @@ class DeleteEmpresaServiceTest {
         // Arrange
         final DeleteEmpresaCommand deleteEmpresaCommand = new DeleteEmpresaCommand("idk, no existe");
 
-        when(empresaRepositoryPort.findById(any())).thenReturn(Optional.empty());
+        when(empresaRepositoryPort.findEmpresaById(any())).thenReturn(Optional.empty());
         // Act & Assert
         assertThrows(EmpresaNotFoundException.class, () -> deleteEmpresaService.execute(deleteEmpresaCommand));
-        verify(empresaRepositoryPort, never()).delete(any());
+        verify(empresaRepositoryPort, never()).deleteEmpresa(any());
     }
 
     // validación del command
 
     @Test
-    @DisplayName("execute() lanza ConstraintViolationException cuandl el id de la empresa está vacío")
+    @DisplayName("execute() lanza ConstraintViolationException cuando el id de la empresa está vacío")
     void shouldThrowWhenCommandIsInvalid(){
         //Arrange
         final DeleteEmpresaCommand deleteEmpresaCommand = new DeleteEmpresaCommand("   ");

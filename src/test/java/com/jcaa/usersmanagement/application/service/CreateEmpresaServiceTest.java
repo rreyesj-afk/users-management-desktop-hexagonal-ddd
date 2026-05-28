@@ -67,8 +67,8 @@ class CreateEmpresaServiceTest {
                 new EmpresaSede("Fouver", "Enfocada en software."),
                 new EmpresaSector("Tecnologia", "Desarrollo de software"));
 
-        when(empresaRepositoryPort.findByName(any())).thenReturn(Optional.empty());
-        when(empresaRepositoryPort.save(any())).thenReturn(savedEmpresa);
+        when(empresaRepositoryPort.findEmpresaByName(any())).thenReturn(Optional.empty());
+        when(empresaRepositoryPort.saveEmpresa(any())).thenReturn(savedEmpresa);
         // Act
         final EmpresaModel result = createEmpresaService.execute(command);
         // Assert
@@ -76,7 +76,7 @@ class CreateEmpresaServiceTest {
                 () -> assertNotNull(result, "resultado no debe ser null"),
                 () -> assertEquals("Fortuna", result.getNameEmpresa().value(), "nombre empresa"),
                 () -> assertEquals("1", result.getIdEmpresa().value(), "id empresa"));
-        verify(empresaRepositoryPort).save(any(EmpresaModel.class));
+        verify(empresaRepositoryPort).saveEmpresa(any(EmpresaModel.class));
         verify(empresaNotificationService).notifyEmpresaCreated(savedEmpresa);
     }
 
@@ -103,10 +103,10 @@ class CreateEmpresaServiceTest {
                 new EmpresaSede("HQE", "principal"),
                 new EmpresaSector("Tecnologia", "software"));
 
-        when(empresaRepositoryPort.findByName(any())).thenReturn(Optional.of(existingEmpresa));
+        when(empresaRepositoryPort.findEmpresaByName(any())).thenReturn(Optional.of(existingEmpresa));
         // Act & Assert
         assertThrows(EmpresaAlreadyExistsException.class, () -> createEmpresaService.execute(command));
-        verify(empresaRepositoryPort, never()).save(any());
+        verify(empresaRepositoryPort, never()).saveEmpresa(any());
         verify(empresaNotificationService, never()).notifyEmpresaCreated(any());
     }
 

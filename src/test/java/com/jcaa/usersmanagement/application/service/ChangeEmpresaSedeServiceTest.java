@@ -67,12 +67,12 @@ class ChangeEmpresaSedeServiceTest {
                 new EmpresaSector("Tecnologia", "Desarrollo software")
         );
 
-        final EmpresaModel updatedEmpresa = currentEmpresa.changeSede(
+        final EmpresaModel changeSede = currentEmpresa.changeSede(
                 new EmpresaSede("Clouur", "Enfocada en hardware.")
         );
 
-        when(empresaRepositoryPort.findById(any())).thenReturn(Optional.of(currentEmpresa));
-        when(empresaRepositoryPort.update(any())).thenReturn(updatedEmpresa);
+        when(empresaRepositoryPort.findEmpresaById(any())).thenReturn(Optional.of(currentEmpresa));
+        when(empresaRepositoryPort.changeEmpresaSede(any())).thenReturn(changeSede);
         // Act
         final EmpresaModel result = changeEmpresaSedeService.execute(changeEmpresaSedeCommand);
         // Assert
@@ -83,8 +83,8 @@ class ChangeEmpresaSedeServiceTest {
                 () -> assertEquals("Enfocada en hardware.", result.getSede().sedeDescription(), "descripcion sede actualizada")
         );
 
-        verify(empresaRepositoryPort).update(any(EmpresaModel.class));
-        verify(empresaNotificationsService).notifySedeChanged(updatedEmpresa);
+        verify(empresaRepositoryPort).changeEmpresaSede(any(EmpresaModel.class));
+        verify(empresaNotificationsService).notifySedeChanged(changeSede);
     }
 
     // ── empresa no existe
@@ -95,10 +95,10 @@ class ChangeEmpresaSedeServiceTest {
         // Arrange
         final ChangeEmpresaSedeCommand changeEmpresaSedeCommand = new ChangeEmpresaSedeCommand("idk, no existe", "Bogota HQ", "Nueva sede principal");
 
-        when(empresaRepositoryPort.findById(any())).thenReturn(Optional.empty());
+        when(empresaRepositoryPort.findEmpresaById(any())).thenReturn(Optional.empty());
         // Act & Assert
         assertThrows(EmpresaNotFoundException.class, () -> changeEmpresaSedeService.execute(changeEmpresaSedeCommand));
-        verify(empresaRepositoryPort, never()).update(any());
+        verify(empresaRepositoryPort, never()).changeEmpresaSede(any());
         verify(empresaNotificationsService, never()).notifySedeChanged(any());
     }
 

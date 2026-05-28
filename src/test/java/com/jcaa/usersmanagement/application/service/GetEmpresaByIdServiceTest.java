@@ -57,7 +57,7 @@ class GetEmpresaByIdServiceTest {
                 new EmpresaSector("Tecnología", "Desarrollo de software.")
         );
 
-        when(empresaRepositoryPort.findById(any())).thenReturn(Optional.of(expected));
+        when(empresaRepositoryPort.findEmpresaById(any())).thenReturn(Optional.of(expected));
         //Act
         final EmpresaModel result = getEmpresaByIdService.execute(query);
         //Assert
@@ -70,7 +70,7 @@ class GetEmpresaByIdServiceTest {
         // Arrange
         final GetEmpresaByIdQuery query = new GetEmpresaByIdQuery("idk, no existe");
 
-        when(empresaRepositoryPort.findById(any())).thenReturn(Optional.empty());
+        when(empresaRepositoryPort.findEmpresaById(any())).thenReturn(Optional.empty());
 
         // Act & Assert
         assertThrows(EmpresaNotFoundException.class, () -> getEmpresaByIdService.execute(query));

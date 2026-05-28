@@ -67,11 +67,11 @@ class UpdateEmpresaAnnualBillingServiceTest {
                 new EmpresaSector("Tecnologia", "Desarrollo software.")
         );
 
-        final EmpresaModel updatedEmpresa = currentEmpresa.updateAnnualBilling(new EmpresaAnnualBilling(new BigDecimal("25000000")));
+        final EmpresaModel updateAnnualBilling = currentEmpresa.updateAnnualBilling(new EmpresaAnnualBilling(new BigDecimal("25000000")));
 
-        when(empresaRepositoryPort.findById(any())).thenReturn(Optional.of(currentEmpresa));
+        when(empresaRepositoryPort.findEmpresaById(any())).thenReturn(Optional.of(currentEmpresa));
 
-        when(empresaRepositoryPort.update(any())).thenReturn(updatedEmpresa);
+        when(empresaRepositoryPort.updateEmpresaAnnualBilling(any())).thenReturn(updateAnnualBilling);
 
         // Act
         final EmpresaModel result = updateEmpresaAnnualBillingService.execute(updateEmpresaAnnualBillingCommand);
@@ -83,8 +83,8 @@ class UpdateEmpresaAnnualBillingServiceTest {
                 () -> assertEquals(new BigDecimal("25000000"), result.getAnnualBilling().value(), "facturación anual actualizada")
         );
 
-        verify(empresaRepositoryPort).update(any(EmpresaModel.class));
-        verify(empresaNotificationsService).notifyAnnualBillingUpdated(updatedEmpresa);
+        verify(empresaRepositoryPort).updateEmpresaAnnualBilling(any(EmpresaModel.class));
+        verify(empresaNotificationsService).notifyAnnualBillingUpdated(updateAnnualBilling);
     }
 
     // ── empresa no existe
@@ -95,10 +95,10 @@ class UpdateEmpresaAnnualBillingServiceTest {
         // Arrange
         final UpdateEmpresaAnnualBillingCommand updateEmpresaAnnualBillingCommand = new UpdateEmpresaAnnualBillingCommand(("idk, no existe"), new BigDecimal("2500000"));
 
-        when(empresaRepositoryPort.findById(any())).thenReturn(Optional.empty());
+        when(empresaRepositoryPort.findEmpresaById(any())).thenReturn(Optional.empty());
         // Act & Assert
         assertThrows(EmpresaNotFoundException.class, () -> updateEmpresaAnnualBillingService.execute(updateEmpresaAnnualBillingCommand));
-        verify(empresaRepositoryPort, never()).update(any());
+        verify(empresaRepositoryPort, never()).updateEmpresaAnnualBilling(any());
         verify(empresaNotificationsService, never()).notifyAnnualBillingUpdated(any());
     }
 

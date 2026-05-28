@@ -67,12 +67,12 @@ class ChangeEmpresaSectorServiceTest {
                 new EmpresaSector("Tecnologia", "Desarrollo software")
         );
 
-        final EmpresaModel updatedEmpresa = currentEmpresa.changeSector(
+        final EmpresaModel changeSector = currentEmpresa.changeSector(
                 new EmpresaSector("Hardware", "Creación y mantenimiento de hardware.")
         );
 
-        when(empresaRepositoryPort.findById(any())).thenReturn(Optional.of(currentEmpresa));
-        when(empresaRepositoryPort.update(any())).thenReturn(updatedEmpresa);
+        when(empresaRepositoryPort.findEmpresaById(any())).thenReturn(Optional.of(currentEmpresa));
+        when(empresaRepositoryPort.changeEmpresaSector(any())).thenReturn(changeSector);
         // Act
         final EmpresaModel result = changeEmpresaSectorService.execute(changeEmpresaSectorCommand);
         // Assert
@@ -83,8 +83,8 @@ class ChangeEmpresaSectorServiceTest {
                 () -> assertEquals("Creación y mantenimiento de hardware.", result.getSector().sectorDescription(), "descripcion sector actualizada")
         );
 
-        verify(empresaRepositoryPort).update(any(EmpresaModel.class));
-        verify(empresaNotificationsService).notifySectorChanged(updatedEmpresa);
+        verify(empresaRepositoryPort).changeEmpresaSector(any(EmpresaModel.class));
+        verify(empresaNotificationsService).notifySectorChanged(changeSector);
     }
 
     // ── empresa no existe
@@ -95,10 +95,10 @@ class ChangeEmpresaSectorServiceTest {
         // Arrange
         final ChangeEmpresaSectorCommand changeEmpresaSectorCommand = new ChangeEmpresaSectorCommand("idk, no existe", "Hardware", "Creación y mantenimiento de hardware.");
 
-        when(empresaRepositoryPort.findById(any())).thenReturn(Optional.empty());
+        when(empresaRepositoryPort.findEmpresaById(any())).thenReturn(Optional.empty());
         // Act & Assert
         assertThrows(EmpresaNotFoundException.class, () -> changeEmpresaSectorService.execute(changeEmpresaSectorCommand));
-        verify(empresaRepositoryPort, never()).update(any());
+        verify(empresaRepositoryPort, never()).changeEmpresaSector(any());
         verify(empresaNotificationsService, never()).notifySedeChanged(any());
     }
 

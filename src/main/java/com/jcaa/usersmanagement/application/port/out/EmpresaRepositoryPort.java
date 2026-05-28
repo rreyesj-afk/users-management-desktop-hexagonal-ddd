@@ -29,7 +29,7 @@ public interface EmpresaRepositoryPort {
     EmpresaModel changeEmpresaSede(EmpresaModel empresa);
 
     //cambiar sector
-    EmpresaModel chngeEmpresaSector(EmpresaModel empresa);
+    EmpresaModel changeEmpresaSector(EmpresaModel empresa);
 
     //eliminar empresa
     void deleteEmpresa(EmpresaId idEmpresa);

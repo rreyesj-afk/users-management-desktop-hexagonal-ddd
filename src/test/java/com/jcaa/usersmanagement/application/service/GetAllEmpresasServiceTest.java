@@ -47,7 +47,7 @@ class GetAllEmpresasServiceTest {
                 new EmpresaSector("Tecnología", "Desarrollo de software.")
         );
 
-        when(empresaRepositoryPort.findAll()).thenReturn(List.of(empresas));
+        when(empresaRepositoryPort.findAllEmpresas()).thenReturn(List.of(empresas));
         //Act
         final List<EmpresaModel> result = getAllEmpresasService.execute();
         //Assert
@@ -60,7 +60,7 @@ class GetAllEmpresasServiceTest {
     @DisplayName("execute() retorna lista vacía cuando no hay empresas")
     void shouldReturnEmptyListWhenNoUsers() {
         // Arrange
-        when(empresaRepositoryPort.findAll()).thenReturn(List.of());
+        when(empresaRepositoryPort.findAllEmpresas()).thenReturn(List.of());
         // Act
         final List<EmpresaModel> result = getAllEmpresasService.execute();
         // Assert
