@@ -27,7 +27,7 @@ public final class EmpresaRepositoryMySQL implements EmpresaRepositoryPort {
     private static final String UPDATE_EMPRESA_ANNUAL_BILLING_SQL =
             "UPDATE empresas "
             + "SET annual_billing = ?, updated_at = NOW() "
-            + "WHERE id_empresa = ?";
+            + "WHERE id_empresa = ? ";
 
     private static final String CHANGE_EMPRESA_SEDE_SQL =
             "UPDATE empresas "
@@ -41,21 +41,22 @@ public final class EmpresaRepositoryMySQL implements EmpresaRepositoryPort {
 
     private static final String SELECT_EMPRESA_BY_ID_SQL =
             "SELECT * "
-            + "FROM empresas"
-            + "WHERE id_empresa = ? LIMIT 1";
+            + "FROM empresas "
+            + "WHERE id_empresa = ? LIMIT 1 ";
 
     private static final String SELECT_EMPRESA_BY_NAME_SQL =
-            "SELECT * "
-            + "WHERE empresa_name = ? LIMIT 1";
+            "SELECT empresa_name "
+            + "FROM empresas "
+            + "WHERE empresa_name = ? LIMIT 1 ";
 
     private static final String SELECT_ALL_EMPRESAS_SQL =
             "SELECT * "
             + "FROM empresas "
-            + "ORDER BY id_empresa ASC";
+            + "ORDER BY id_empresa ASC ";
 
     private static final String DELETE_EMPRESA_SQL =
-            "DELETE FROM empresas"
-            + "WHERE id_empresa = ?";
+            "DELETE FROM empresas "
+            + "WHERE id_empresa = ? ";
 
     private final Connection connection;
 
@@ -117,7 +118,7 @@ public final class EmpresaRepositoryMySQL implements EmpresaRepositoryPort {
             return Optional.of(EmpresaPersistenceMapper.fromResultSetToModel(resultSet));
         }
 
-        catch (final SQLException exception) {
+        catch (final SQLException exception) {exception.printStackTrace();
             throw PersistenceException.becauseFindEmpresaByNameFailed(empresaName.value(), exception);
         }
     }
