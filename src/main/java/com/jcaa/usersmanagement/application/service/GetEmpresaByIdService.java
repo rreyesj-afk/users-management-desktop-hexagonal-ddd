@@ -26,7 +26,7 @@ public final class GetEmpresaByIdService implements GetEmpresaByIdUseCase {
 
         final EmpresaId idEmpresa = EmpresaApplicationMapper.fromGetEmpresaByIdQueryToEmpresaId(query);
         return empresaRepositoryPort
-                .findById(idEmpresa)
+                .findEmpresaById(idEmpresa)
                 .orElseThrow(() -> EmpresaNotFoundException.becauseIdWasNotFound(idEmpresa.value()));
     }
 
