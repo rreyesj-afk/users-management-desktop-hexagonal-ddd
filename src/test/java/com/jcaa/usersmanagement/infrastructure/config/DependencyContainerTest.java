@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mockStatic;
 
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.exception.PersistenceException;
+import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.EmpresaController;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.desktop.controller.UserController;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -31,6 +32,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DependencyContainerTest {
 
   @Mock private Connection mockConnection;
+
+  // ==========================
+  // USER TESTS
+  // ==========================
 
   // ── constructor + userController() — happy path
 
@@ -81,6 +86,52 @@ class DependencyContainerTest {
     }
   }
 
+  // ==========================
+  // EMPRESA TESTS
+  // ==========================
+
+  // ── constructor + empresaController() — happy path
+
+  @Test
+  @DisplayName("constructor wires all dependencies and empresaController() returns a non-null EmpresaController")
+  void shouldWireAllDependenciesAndExposeNonNullEmpresaController() {
+    // Arrange
+    try (final MockedStatic<DriverManager> mockedDriverManager = mockStatic(DriverManager.class)) {
+      mockedDriverManager.when(
+              () -> DriverManager.getConnection(
+                      any(String.class),
+                      any(String.class),
+                      any(String.class)))
+              .thenReturn(mockConnection);
+      // Act
+      final DependencyContainer container = new DependencyContainer();
+      // Assert
+      assertNotNull(container.empresaController(), "empresaController() must return a non-null EmpresaController after successful construction");
+    }
+  }
+
+  // empresaController() — immutable composition graph
+
+  @Test
+  @DisplayName("empresaController() returns the same EmpresaController instance on every call")
+  void shouldReturnTheSameEmpresaControllerInstanceOnEveryCall() {
+    // Arrange
+    try (final MockedStatic<DriverManager> mockedDriverManager = mockStatic(DriverManager.class)) {
+      mockedDriverManager.when(
+              () -> DriverManager.getConnection(
+                      any(String.class),
+                      any(String.class),
+                      any(String.class)))
+              .thenReturn(mockConnection);
+      final DependencyContainer container = new DependencyContainer();
+      // Act
+      final EmpresaController first = container.empresaController();
+      final EmpresaController second = container.empresaController();
+      // Assert
+      assertSame(first, second, "empresaController() must return the same instance on every call");
+    }
+  }
+
   // ── constructor — database failure → PersistenceException
 
   @Test
@@ -91,17 +142,18 @@ class DependencyContainerTest {
     final SQLException cause = new SQLException("Connection refused");
     try (final MockedStatic<DriverManager> mockedDriverManager = mockStatic(DriverManager.class)) {
       mockedDriverManager
-          .when(
-              () ->
-                  DriverManager.getConnection(
-                      any(String.class), any(String.class), any(String.class)))
-          .thenThrow(cause);
+              .when(
+                      () ->
+                              DriverManager.getConnection(
+                                      any(String.class), any(String.class), any(String.class)))
+              .thenThrow(cause);
 
       // Act & Assert
       assertThrows(
-          PersistenceException.class,
-          DependencyContainer::new,
-          "PersistenceException must propagate without wrapping when DriverManager throws SQLException");
+              PersistenceException.class,
+              DependencyContainer::new,
+              "PersistenceException must propagate without wrapping when DriverManager throws SQLException");
     }
   }
+
 }
