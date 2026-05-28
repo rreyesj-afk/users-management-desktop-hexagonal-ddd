@@ -31,7 +31,7 @@ public final class UpdateEmpresaAnnualBillingService implements UpdateEmpresaAnn
         final EmpresaModel current = findExistingEmpresaOrFail(idEmpresa);
         final EmpresaAnnualBilling newAnnualBilling = EmpresaApplicationMapper.fromUpdateAnnualBillingCommandToAnnualBilling(command);
         final EmpresaModel empresaToUpdate = current.updateAnnualBilling(newAnnualBilling);
-        final EmpresaModel updatedEmpresa = empresaRepositoryPort.update(empresaToUpdate);
+        final EmpresaModel updatedEmpresa = empresaRepositoryPort.updateEmpresaAnnualBilling(empresaToUpdate);
 
         empresaNotificationsService.notifyAnnualBillingUpdated(updatedEmpresa);
 
@@ -46,7 +46,7 @@ public final class UpdateEmpresaAnnualBillingService implements UpdateEmpresaAnn
     }
 
     private EmpresaModel findExistingEmpresaOrFail(final EmpresaId idEmpresa) {
-        return  empresaRepositoryPort.findById(idEmpresa).orElseThrow(
+        return  empresaRepositoryPort.findEmpresaById(idEmpresa).orElseThrow(
                 () -> EmpresaNotFoundException.becauseIdWasNotFound(idEmpresa.value())
         );
     }

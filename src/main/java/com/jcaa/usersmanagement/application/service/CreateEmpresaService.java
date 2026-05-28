@@ -32,7 +32,7 @@ public final class CreateEmpresaService implements CreateEmpresaUseCase {
         ensureEmpresaNameIsNotTaken(nameEmpresa);
 
         final EmpresaModel empresaToSave = EmpresaApplicationMapper.fromCreateCommandToModel(command);
-        final EmpresaModel savedEmpresa = empresaRepositoryPort.save(empresaToSave);
+        final EmpresaModel savedEmpresa = empresaRepositoryPort.saveEmpresa(empresaToSave);
 
         empresaNotificationService.notifyEmpresaCreated(savedEmpresa);
 
@@ -47,7 +47,7 @@ public final class CreateEmpresaService implements CreateEmpresaUseCase {
     }
 
     private void ensureEmpresaNameIsNotTaken (final EmpresaName nameEmpresa) {
-        empresaRepositoryPort.findByName(nameEmpresa).ifPresent(ignored -> {
+        empresaRepositoryPort.findEmpresaByName(nameEmpresa).ifPresent(ignored -> {
             throw EmpresaAlreadyExistsException.becauseNameAlreadyExists(nameEmpresa.value());
         });
     }

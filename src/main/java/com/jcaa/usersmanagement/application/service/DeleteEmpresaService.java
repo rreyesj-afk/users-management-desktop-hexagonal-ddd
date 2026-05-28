@@ -25,7 +25,7 @@ public class DeleteEmpresaService implements DeleteEmpresaUseCase {
 
         final EmpresaId idEmpresa = EmpresaApplicationMapper.fromDeleteCommandToEmpresaId(command);
         ensureEmpresaExists(idEmpresa);
-        empresaRepositoryPort.delete(idEmpresa);
+        empresaRepositoryPort.deleteEmpresa(idEmpresa);
     }
 
     private void validateCommand(final DeleteEmpresaCommand command){
@@ -36,7 +36,7 @@ public class DeleteEmpresaService implements DeleteEmpresaUseCase {
     }
 
     private void ensureEmpresaExists(final EmpresaId idEmpresa) {
-        empresaRepositoryPort.findById(idEmpresa).orElseThrow(() ->
+        empresaRepositoryPort.findEmpresaById(idEmpresa).orElseThrow(() ->
             EmpresaNotFoundException.becauseIdWasNotFound(idEmpresa.toString())
         );
     }

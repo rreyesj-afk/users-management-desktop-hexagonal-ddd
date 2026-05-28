@@ -32,7 +32,7 @@ public final class ChangeEmpresaSectorService implements ChangeEmpresaSectorUseC
         final EmpresaModel current = findExistingEmpresaOrFail(idEmpresa);
         final EmpresaSector newSector = EmpresaApplicationMapper.fromChangeSectorCommandToSector(command);
         final EmpresaModel empresaToUpdate = current.changeSector(newSector);
-        final EmpresaModel changeSector= empresaRepositoryPort.update(empresaToUpdate);
+        final EmpresaModel changeSector= empresaRepositoryPort.chngeEmpresaSector(empresaToUpdate);
 
         empresaNotificationsService.notifySectorChanged(changeSector);
 
@@ -47,7 +47,7 @@ public final class ChangeEmpresaSectorService implements ChangeEmpresaSectorUseC
     }
 
     private EmpresaModel findExistingEmpresaOrFail(final EmpresaId idEmpresa) {
-        return empresaRepositoryPort.findById(idEmpresa).orElseThrow(
+        return empresaRepositoryPort.findEmpresaById(idEmpresa).orElseThrow(
                 () -> EmpresaNotFoundException.becauseIdWasNotFound(idEmpresa.value())
         );
     }

@@ -14,6 +14,6 @@ public final class GetAllEmpresasService implements GetAllEmpresasUseCase {
 
     @Override
     public List<EmpresaModel> execute() {
-        return getAllEmpresasPort.findAll();
+        return getAllEmpresasPort.findAllEmpresas();
     }
 }
