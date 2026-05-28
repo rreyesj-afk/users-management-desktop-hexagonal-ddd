@@ -1,7 +1,9 @@
 package com.jcaa.usersmanagement.infrastructure.adapter.persistence.repository;
 
 import com.jcaa.usersmanagement.domain.exception.EmpresaNotFoundException;
+import com.jcaa.usersmanagement.domain.exception.UserNotFoundException;
 import com.jcaa.usersmanagement.domain.model.EmpresaModel;
+import com.jcaa.usersmanagement.domain.model.UserModel;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaAnnualBilling;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaId;
 import com.jcaa.usersmanagement.domain.valueobject.EmpresaIncorporationDate;
@@ -25,7 +27,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @DisplayName("EmpresaRepositoryMySQL")
 @ExtendWith(MockitoExtension.class)
@@ -47,8 +49,12 @@ class EmpresaRepositoryMySQLTest {
     @Mock
     private PreparedStatement statement;
     @Mock
+    private PreparedStatement selectStatement;
+    @Mock
     private ResultSet resultSet;
 
+    @Mock
+    private ResultSet generatedKeysResultSet;
     private EmpresaRepositoryMySQL empresaRepositoryMySQL;
     private EmpresaModel empresaModel;
     private EmpresaId idEmpresa;
@@ -71,18 +77,16 @@ class EmpresaRepositoryMySQLTest {
 
     // Helper: wire connection → statement → resultSet
     private void configureSelectStatement() throws SQLException {
-        when(connection.prepareStatement(anyString())).thenReturn(statement);
-        when(statement.executeQuery()).thenReturn(resultSet);
+        when(connection.prepareStatement(anyString())).thenReturn(selectStatement);
+        when(selectStatement.executeQuery()).thenReturn(resultSet);
     }
 
     private void configureInsertStatement() throws SQLException {
         when(connection.prepareStatement(anyString(), eq(Statement.RETURN_GENERATED_KEYS))).thenReturn(statement);
-        when(statement.getGeneratedKeys()).thenReturn(resultSet);
-        when(resultSet.getInt(1)).thenReturn(Integer.parseInt(EMPRESA_ID));
-    }
+        when(statement.getGeneratedKeys()).thenReturn(generatedKeysResultSet);
+        when(generatedKeysResultSet.next()).thenReturn(true);
 
-    private void configureBasicStatement() throws SQLException {
-        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        when(generatedKeysResultSet.getInt(1)).thenReturn(Integer.parseInt(EMPRESA_ID));
     }
 
     // Helper: configure resultSet to return one full user row
@@ -99,123 +103,392 @@ class EmpresaRepositoryMySQLTest {
         when(resultSet.getString("updated_at")).thenReturn(UPDATED_AT);
     }
 
+    // ==================================================
+    // saveEmpresa()
+    // ==================================================
+
     @Test
-    @DisplayName("save() ejecuta INSERT y devuelve la empresa persistida")
-    void shouldSaverEmpresaAndReturnById() throws SQLException {
+    @DisplayName("saveEmpresa() ejecuta INSERT y devuelve empresa persistida")
+    void shouldSaveEmpresaAndReturnById() throws SQLException {
         // Arrange
         configureInsertStatement();
         configureSelectStatement();
         when(statement.executeUpdate()).thenReturn(1);
-        when(resultSet.next()).thenReturn(true, true);
+        when(resultSet.next()).thenReturn(true);
         configureResultSetRow();
         // Act
-        final EmpresaModel result = empresaRepositoryMySQL.save(empresaModel);
+        final EmpresaModel result = empresaRepositoryMySQL.saveEmpresa(empresaModel);
         // Assert
-        assertAll("save() happy path",
+        assertAll("saveEmpresa() happy path",
                 () -> assertEquals(EMPRESA_ID, result.getIdEmpresa().value()),
                 () -> assertEquals(EMPRESA_NAME, result.getNameEmpresa().value()),
                 () -> assertEquals(INCORPORATION_DATE, result.getIncorporationDate().value()),
-                () -> assertEquals(ANNUAL_BILLING, result.getAnnualBilling().value())
+                () -> assertEquals(ANNUAL_BILLING, result.getAnnualBilling().value()),
+                () -> assertEquals(SEDE_NAME, result.getSede().sedeName()),
+                () -> assertEquals(SEDE_DESCRIPTION, result.getSede().sedeDescription()),
+                () -> assertEquals(SECTOR_NAME, result.getSector().sectorName()),
+                () -> assertEquals(SECTOR_DESCRIPTION, result.getSector().sectorDescription())
         );
     }
 
+    // saveEmpresa() - INSERT fails → PersistenceException
+
     @Test
-    @DisplayName("save() lanza PersistenceException cuando INSERT falla")
+    @DisplayName("saveEmpresa() lanza PersistenceException cuando INSERT falla")
     void shouldThrowPersistenceExceptionWhenInsertFails() throws SQLException {
         // Arrange
-        when(connection.prepareStatement(anyString(), eq(Statement.RETURN_GENERATED_KEYS))).thenReturn(statement);
+        when(connection.prepareStatement(anyString(), eq(Statement.RETURN_GENERATED_KEYS)
+        )).thenReturn(statement);
         when(statement.executeUpdate()).thenThrow(new SQLException("Insert failed"));
         // Act & Assert
         assertThrows(
                 PersistenceException.class,
-                () -> empresaRepositoryMySQL.save(empresaModel)
+                () -> empresaRepositoryMySQL.saveEmpresa(empresaModel)
         );
     }
 
+    // saveEmpresa() → findByIdOrFail — empresa not found after insert → EmpresaNotFoundException
+
     @Test
-    @DisplayName("save() lanza EmpresaNotFoundException cuando no encuentra la empresa")
+    @DisplayName("saveEmpresa() throws EmpresaNotFoundException when the saved empresa cannot be found")
     void shouldThrowEmpresaNotFoundExceptionWhenEmpresaNotFoundAfterSave() throws SQLException {
         // Arrange
         configureInsertStatement();
         configureSelectStatement();
         when(statement.executeUpdate()).thenReturn(1);
-        when(resultSet.next()).thenReturn(true, false);
-        // Act & Assert
-        assertThrows(EmpresaNotFoundException.class, () -> empresaRepositoryMySQL.save(empresaModel)
+        when(resultSet.next()).thenReturn(false);
+        // Act + Assert
+        assertThrows(
+                EmpresaNotFoundException.class,
+                () -> empresaRepositoryMySQL.saveEmpresa(empresaModel)
         );
     }
 
+    // ==================================================
+    // updateAnnualBilling()
+    // ==================================================
+
     @Test
-    @DisplayName("update() ejecuta UPDATE y devuelve empresa")
-    void shouldUpdateEmpresaAndReturnById() throws SQLException {
+    @DisplayName("updateAnnualBilling() ejecuta UPDATE_EMPRESA_ANNUAL_BILLING y devuelve empresa actualizada")
+    void shouldUpdateAnnualBillingAndReturnEmpresa() throws SQLException {
         // Arrange
-        configureBasicStatement();
-        when(statement.executeQuery()).thenReturn(resultSet);
+        when(connection.prepareStatement(anyString())).thenReturn(statement, selectStatement);
         when(statement.executeUpdate()).thenReturn(1);
+        when(selectStatement.executeQuery()).thenReturn(resultSet);
         when(resultSet.next()).thenReturn(true);
         configureResultSetRow();
         // Act
-        final EmpresaModel result = empresaRepositoryMySQL.update(empresaModel);
+        final EmpresaModel result = empresaRepositoryMySQL.updateEmpresaAnnualBilling(empresaModel);
         // Assert
-        assertEquals(EMPRESA_ID, result.getIdEmpresa().value());
+        assertAll("updated annual billing empresa",
+                () -> assertEquals(EMPRESA_ID, result.getIdEmpresa().value()),
+                () -> verify(statement).setString(1, ANNUAL_BILLING.toString()),
+                () -> verify(statement).setString(2, EMPRESA_ID),
+                () -> verify(statement).executeUpdate()
+        );
     }
 
+    // updateEmpresaAnnualBilling() - UPDATE fails → PersistenceException
+
     @Test
-    @DisplayName("findById() devuelve Optional.of cuando encuentra empresa")
+    @DisplayName("updateEmpresaAnnualBilling() throws PersistenceException when UPDATE raises SQLException")
+    void shouldThrowPersistenceExceptionWhenUpdateAnnualBillingFails() throws SQLException {
+        // Arrange
+        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        when(statement.executeUpdate()).thenThrow(new SQLException("Update failed"));
+        // Act & Assert
+        assertThrows(
+                PersistenceException.class,
+                () -> empresaRepositoryMySQL.updateEmpresaAnnualBilling(empresaModel));
+    }
+
+    // ==================================================
+    // changeSede()
+    // ==================================================
+
+    @Test
+    @DisplayName("changeEmpresaSede() ejecuta UPDATE y devuelve empresa actualizada")
+    void shouldChangeSedeAndReturnEmpresa() throws SQLException {
+        //Arrange
+        when(connection.prepareStatement(anyString())).thenReturn(statement, selectStatement);
+        when(statement.executeUpdate()).thenReturn(1);
+        when(selectStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        configureResultSetRow();
+        //Act
+        final EmpresaModel result = empresaRepositoryMySQL.changeEmpresaSede(empresaModel);
+        //Assert
+        assertAll("changed sede empresa",
+                () -> assertEquals(EMPRESA_ID, result.getIdEmpresa().value()),
+                () -> verify(statement).setString(1, SEDE_NAME),
+                () -> verify(statement).setString(2, SEDE_DESCRIPTION),
+                () -> verify(statement).setString(3, EMPRESA_ID)
+        );
+    }
+
+    // changeEmpresaSede() - UPDATE fails → PersistenceException
+
+    @Test
+    @DisplayName("changeEmpresaSede() throws PersistenceException when UPDATE raises SQLException")
+    void shouldThrowPersistenceExceptionWhenUpdateSedeFails() throws SQLException {
+        // Arrange
+        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        when(statement.executeUpdate()).thenThrow(new SQLException("Update failed"));
+        // Act & Assert
+        assertThrows(
+                PersistenceException.class,
+                () -> empresaRepositoryMySQL.changeEmpresaSede(empresaModel)
+        );
+    }
+
+    // ==================================================
+    // changeSector()
+    // ==================================================
+
+    @Test
+    @DisplayName("changeEmpresaSector() ejecuta UPDATE y devuelve empresa actualizada")
+    void shouldChangeSectorAndReturnEmpresa() throws SQLException {
+        //Arrange
+        when(connection.prepareStatement(anyString())).thenReturn(statement, selectStatement);
+        when(statement.executeUpdate()).thenReturn(1);
+        when(selectStatement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(true);
+        configureResultSetRow();
+        //Act
+        final EmpresaModel result = empresaRepositoryMySQL.changeEmpresaSector(empresaModel);
+        //Asser
+        assertAll("changed sector empresa",
+                () -> assertEquals(EMPRESA_ID, result.getIdEmpresa().value()),
+                () -> verify(statement).setString(1, SECTOR_NAME),
+                () -> verify(statement).setString(2, SECTOR_DESCRIPTION),
+                () -> verify(statement).setString(3, EMPRESA_ID)
+        );
+    }
+
+    // changeEmpresaSector() - UPDATE fails → PersistenceException
+
+    @Test
+    @DisplayName("changeEmpresaSector() throws PersistenceException when UPDATE raises SQLException")
+    void shouldThrowPersistenceExceptionWhenUpdateSectorFails() throws SQLException {
+        // Arrange
+        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        when(statement.executeUpdate()).thenThrow(new SQLException("Update failed"));
+        // Act & Assert
+        assertThrows(
+                PersistenceException.class,
+                () -> empresaRepositoryMySQL.changeEmpresaSector(empresaModel)
+        );
+    }
+
+    // ==================================================
+    // findById()
+    // ==================================================
+
+    @Test
+    @DisplayName("findEmpresaById() devuelve Optional.of(empresa) cuando encuentra empresa")
     void shouldReturnEmpresaWhenFound() throws SQLException {
         // Arrange
         configureSelectStatement();
         when(resultSet.next()).thenReturn(true);
         configureResultSetRow();
         // Act
-        final Optional<EmpresaModel> result = empresaRepositoryMySQL.findById(idEmpresa);
+        final Optional<EmpresaModel> result = empresaRepositoryMySQL.findEmpresaById(idEmpresa);
         // Assert
-        assertTrue(result.isPresent());
-        assertEquals(EMPRESA_ID, result.get().getIdEmpresa().value());
+        assertAll("findEmpresaById() found",
+                () -> assertTrue(result.isPresent(), "must be present"),
+                () -> assertEquals(EMPRESA_ID, result.get().getIdEmpresa().value())
+        );
     }
 
+    // findEmpresaById() — no row → Optional.empty()
+
     @Test
-    @DisplayName("findById() devuelve Optional.empty()")
+    @DisplayName("findEmpresaById() devuelve Optional.empty()")
     void shouldReturnEmptyWhenNotFound() throws SQLException {
         // Arrange
         configureSelectStatement();
         when(resultSet.next()).thenReturn(false);
         // Act
-        final Optional<EmpresaModel> result = empresaRepositoryMySQL.findById(idEmpresa);
+        final Optional<EmpresaModel> result = empresaRepositoryMySQL.findEmpresaById(idEmpresa);
         // Assert
         assertTrue(result.isEmpty());
     }
 
+    // ── findEmpresaById() — SQLException → PersistenceException (from prepareStatement)
+
     @Test
-    @DisplayName("findAll() devuelve empresas")
-    void shouldReturnAllUsers() throws SQLException {
+    @DisplayName("findEmpresaById() throws PersistenceException when prepareStatement raises SQLException")
+    void shouldThrowPersistenceExceptionOnFindEmpresaByIdFailure() throws SQLException {
         // Arrange
-        configureSelectStatement();
-        when(resultSet.next()).thenReturn(true, false);
-        configureResultSetRow();
-        // Act
-        final List<EmpresaModel> result = empresaRepositoryMySQL.findAll();
-        // Assert
-        assertEquals(1, result.size());
-        assertEquals(EMPRESA_ID, result.get(0).getIdEmpresa().value());
+        when(connection.prepareStatement(anyString())).thenThrow(new SQLException("Query failed"));
+        // Act & Assert
+        assertThrows(
+                PersistenceException.class,
+                () -> empresaRepositoryMySQL.findEmpresaById(idEmpresa));
     }
 
-    @Test
-    @DisplayName("delete() ejecuta DELETE sin error")
+    // ── findEmpresaById() — SQLException → PersistenceException (from executeQuery, inside try body)
 
-    void shouldDeleteEmpresaWithoutThrowing() throws SQLException {
-        configureBasicStatement();
+    @Test
+    @DisplayName("findEmpresaById() throws PersistenceException when executeQuery raises SQLException")
+    void shouldThrowPersistenceExceptionWhenFindEmpresaByIdExecuteQueryFails() throws SQLException {
+        // Arrange
         when(connection.prepareStatement(anyString())).thenReturn(statement);
-        assertDoesNotThrow(() -> empresaRepositoryMySQL.delete(idEmpresa)
+        when(statement.executeQuery()).thenThrow(new SQLException("Execute query failed"));
+        // Act & Assert
+        assertThrows(
+                PersistenceException.class,
+                () -> empresaRepositoryMySQL.findEmpresaById(idEmpresa));
+    }
+
+    // ── findEmpresaById() — SQLException → PersistenceException (from statement.close() after normal exit)
+
+    @Test
+    @DisplayName("findEmpresaById() throws PersistenceException when PreparedStatement.close() raises SQLException")
+    void shouldThrowPersistenceExceptionWhenFindEmpresaByIdStatementCloseFails() throws SQLException {
+        // Arrange
+        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        when(statement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+        doThrow(new SQLException("Close failed")).when(statement).close();
+        // Act & Assert
+        assertThrows(
+                PersistenceException.class,
+                () -> empresaRepositoryMySQL.findEmpresaById(idEmpresa));
+    }
+
+    // ==================================================
+    // findEmpresaByName()
+    // ==================================================
+
+    @Test
+    @DisplayName("findEmpresaByName() devuelve Optional.of")
+    void shouldReturnEmpresaWhenFoundByName() throws SQLException {
+        //Arrange
+        configureSelectStatement();
+        when(resultSet.next()).thenReturn(true);
+        configureResultSetRow();
+        //Act
+        final Optional<EmpresaModel> result = empresaRepositoryMySQL.findEmpresaByName(nameEmpresa);
+        assertAll("findEmpresaByName() found",
+                () -> assertTrue(result.isPresent()),
+                () -> assertEquals(EMPRESA_NAME, result.get().getNameEmpresa().value())
         );
     }
 
+    // ── findEmpresaByName() — no row → Optional.empty()
+
     @Test
-    @DisplayName("delete() lanza PersistenceException")
+    @DisplayName("findEmpresaByName() returns Optional.empty() when no matching row exists")
+    void shouldReturnEmptyWhenEmpresaNotFoundByName() throws SQLException {
+        // Arrange
+        configureSelectStatement();
+        when(resultSet.next()).thenReturn(false);
+        // Act
+        final Optional<EmpresaModel> result = empresaRepositoryMySQL.findEmpresaByName(nameEmpresa);
+        // Assert
+        assertTrue(result.isEmpty());
+    }
+
+    // ── findEmpresaByName() — SQLException → PersistenceException (from prepareStatement)
+
+    @Test
+    @DisplayName("findEmpresaByName() throws PersistenceException when prepareStatement raises SQLException")
+    void shouldThrowPersistenceExceptionFindEmpresaByNameFailure() throws SQLException {
+        // Arrange
+        when(connection.prepareStatement(anyString())).thenThrow(new SQLException("Query failed"));
+        // Act & Assert
+        assertThrows(
+                PersistenceException.class,
+                () -> empresaRepositoryMySQL.findEmpresaByName(nameEmpresa));
+    }
+
+    // ── findEmpresaByName() — SQLException → PersistenceException (from executeQuery, inside try body)
+
+    @Test
+    @DisplayName("findEmpresaByName() throws PersistenceException when executeQuery raises SQLException")
+    void shouldThrowPersistenceExceptionWhenFindEmpresaByNameExecuteQueryFails() throws SQLException {
+        // Arrange
+        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        when(statement.executeQuery()).thenThrow(new SQLException("Execute query failed"));
+        // Act & Assert
+        assertThrows(
+                PersistenceException.class,
+                () -> empresaRepositoryMySQL.findEmpresaByName(nameEmpresa));
+    }
+
+    // ── findEmpresaByName() — SQLException → PersistenceException (from statement.close() after normal
+    // exit)
+
+    @Test
+    @DisplayName("findEmpresaByName() throws PersistenceException when PreparedStatement.close() raises SQLException")
+    void shouldThrowPersistenceExceptionWhenFindEmpresaByNameStatementCloseFails() throws SQLException {
+        // Arrange
+        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        when(statement.executeQuery()).thenReturn(resultSet);
+        when(resultSet.next()).thenReturn(false);
+        doThrow(new SQLException("Close failed")).when(statement).close();
+        // Act & Assert
+        assertThrows(
+                PersistenceException.class,
+                () -> empresaRepositoryMySQL.findEmpresaByName(nameEmpresa));
+    }
+
+    // ==================================================
+    // findAllEmpresas()
+    // ==================================================
+
+    @Test
+    @DisplayName("findAllEmpresas() devuelve empresas")
+    void shouldReturnAllEmpresas() throws SQLException {
+        configureSelectStatement();
+        when(resultSet.next()).thenReturn(true, false);
+        configureResultSetRow();
+        final List<EmpresaModel> result = empresaRepositoryMySQL.findAllEmpresas();
+        assertAll("findAllEmpresas() happy path",
+                () -> assertEquals(1, result.size()),
+                () -> assertEquals(EMPRESA_ID, result.get(0).getIdEmpresa().value())
+        );
+    }
+
+    // ── findAllEmpresas() — SQLException → PersistenceException
+
+    @Test
+    @DisplayName("findAllEmpresas() throws PersistenceException when the query raises SQLException")
+    void shouldThrowPersistenceExceptionOnFindAllEmpresasFailure() throws SQLException {
+        // Arrange
+        when(connection.prepareStatement(anyString())).thenThrow(new SQLException("Query failed"));
+        // Act & Assert
+        assertThrows(PersistenceException.class,
+                () -> empresaRepositoryMySQL.findAllEmpresas());
+    }
+
+    // ==================================================
+    // deleteEmpresa()
+    // ==================================================
+
+    @Test
+    @DisplayName("deleteEmpresa() ejecuta DELETE sin error")
+    void shouldDeleteEmpresaWithoutThrowing() throws SQLException {
+        //Arrange
+        when(connection.prepareStatement(anyString())).thenReturn(statement);
+        //Act & Assert
+        assertDoesNotThrow(
+                () -> empresaRepositoryMySQL.deleteEmpresa(idEmpresa)
+        );
+    }
+
+    // deleteEmpresa() — SQLException → PersistenceException
+
+    @Test
+    @DisplayName("deleteEmpresa() lanza PersistenceException")
     void shouldThrowPersistenceExceptionWhenDeleteFails() throws SQLException {
-        configureBasicStatement();
+        //Arrange
         when(connection.prepareStatement(anyString())).thenThrow(new SQLException("Delete failed"));
-        assertThrows(PersistenceException.class, () -> empresaRepositoryMySQL.delete(idEmpresa)
+        //Act & Assert
+        assertThrows(
+                PersistenceException.class,
+                () -> empresaRepositoryMySQL.deleteEmpresa(idEmpresa)
         );
     }
 }
