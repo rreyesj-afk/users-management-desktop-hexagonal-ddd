@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum MenuOption {
+public enum UserMenuOption {
 
   LIST_USERS(1, "List all users"),
   FIND_USER(2, "Find user by ID"),
@@ -19,8 +19,8 @@ public enum MenuOption {
   private final int number;
   private final String description;
 
-  public static Optional<MenuOption> fromNumber(final int number) {
-    for (final MenuOption option : values()) {
+  public static Optional<UserMenuOption> fromNumber(final int number) {
+    for (final UserMenuOption option : values()) {
       if (option.number == number) {
         return Optional.of(option);
       }
